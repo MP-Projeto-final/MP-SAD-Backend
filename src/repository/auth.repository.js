@@ -1,4 +1,4 @@
-import { db } from "../database/database.js";
+import { db } from "../database.js";
 
 export async function findUserByEmail(email) {
   const query = 'SELECT * FROM Usuarios WHERE email = $1';
