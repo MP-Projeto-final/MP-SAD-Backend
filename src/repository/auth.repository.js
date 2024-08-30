@@ -10,19 +10,22 @@ export async function findUserByEmail(email) {
 export async function createUser(email, hashedPassword, name) {
   const query = 'INSERT INTO Usuarios (email, senha, nome) VALUES ($1, $2, $3)';
   const values = [email, hashedPassword, name];
-  await db.query(query, values);
+  const result = await db.query(query, values);
+  return result.rowCount; // Retorna rowCount para verificar o sucesso
 }
 
 export async function createSession(token, userId) {
   const query = 'INSERT INTO Sessions (token, id_usuario) VALUES ($1, $2)';
   const values = [token, userId];
-  await db.query(query, values);
+  const result = await db.query(query, values);
+  return result.rowCount; // Retorna rowCount para verificar o sucesso
 }
 
 export async function logoutUser(userId, token) {
   const query = 'DELETE FROM Sessions WHERE id_usuario = $1 AND token = $2';
   const values = [userId, token];
-  await db.query(query, values);
+  const result = await db.query(query, values);
+  return result.rowCount; // Retorna rowCount para verificar o sucesso
 }
 
 export async function findUserByToken(token) {
