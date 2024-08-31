@@ -11,21 +11,21 @@ export async function createUser(email, hashedPassword, name) {
   const query = 'INSERT INTO Usuarios (email, senha, nome) VALUES ($1, $2, $3)';
   const values = [email, hashedPassword, name];
   const result = await db.query(query, values);
-  return result.rowCount; // Retorna rowCount para verificar o sucesso
+  return result.rows[0];
 }
 
 export async function createSession(token, userId) {
   const query = 'INSERT INTO Sessions (token, id_usuario) VALUES ($1, $2)';
   const values = [token, userId];
   const result = await db.query(query, values);
-  return result.rowCount; // Retorna rowCount para verificar o sucesso
+  return result.rows[0];
 }
 
 export async function logoutUser(userId, token) {
   const query = 'DELETE FROM Sessions WHERE id_usuario = $1 AND token = $2';
   const values = [userId, token];
   const result = await db.query(query, values);
-  return result.rowCount; // Retorna rowCount para verificar o sucesso
+  return result.rows[0];
 }
 
 export async function findUserByToken(token) {
