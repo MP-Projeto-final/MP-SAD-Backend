@@ -7,13 +7,13 @@ const mockDbQuery = async (query, values) => {
     return { rows: values[0] === 'existing@example.com' ? [{ id: 1, email: 'existing@example.com', nome: 'Test User' }] : [] };
   }
   if (query.includes('INSERT INTO Usuarios')) {
-    return { rows: [{ id: 2, email: 'new@example.com', nome: 'New User' }] }; // Retornando o usuário criado
+    return { rows: [{ id: 2, email: 'new@example.com', nome: 'New User' }] }; 
   }
   if (query.includes('INSERT INTO Sessions')) {
-    return { rows: [{ token: 'valid-token', id_usuario: 1 }] }; // Retornando a sessão criada
+    return { rows: [{ token: 'valid-token', id_usuario: 1 }] }; 
   }
   if (query.includes('DELETE FROM Sessions WHERE id_usuario = $1 AND token = $2')) {
-    return { rows: [{ token: 'valid-token', id_usuario: 1 }] }; // Retornando a sessão deletada
+    return { rows: [{ token: 'valid-token', id_usuario: 1 }] }; 
   }
   return { rows: [], rowCount: 0 }; 
 };

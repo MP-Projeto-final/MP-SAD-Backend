@@ -31,7 +31,9 @@ export async function signIn(email, password) {
 
   const token = uuid();
   await userRepository.createSession(token, user.id);
-  return { token, username: user.nome };
+
+  console.log("Usuário logado com sucesso, ID do usuário:", user.id);
+  return { token, userId: user.id, username: user.nome }
 }
 
 export async function logout(userId, token) {

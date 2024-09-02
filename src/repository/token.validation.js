@@ -1,13 +1,21 @@
 import { db } from "../database.js";
 
 export async function findUserByToken(token) {
-    const tokenArray = [token];
-    const outputArray = tokenArray.map(item => item.replace(/'/g, ''));
-
-    try {
-        const result = await db.query('SELECT users.*, sessions.* FROM users JOIN sessions ON users.id = sessions.user_id WHERE token = $1', outputArray);
-        return result.rows[0] || null;
-    } catch (error) {
-        throw error;
+    const query = `
+      SELECT usuarios.id AS user_id, usuarios.nome, usuarios.email
+      FROM usuarios
+      JOIN sessions ON usuarios.id = sessions.id_usuario
+      WHERE sessions.token = $1;
+    `;
+    const values = [token];
+    const result = await db.query(query, values);
+  
+    if (result.rows.length > 0) {
+      return {
+        id: result.rows[0].user_id,  // O ID correto do usuário
+        nome: result.rows[0].nome,
+        email: result.rows[0].email,
+      };
     }
-}
+    return null;
+  }

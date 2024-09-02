@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { db } from "./database.js";
 import authRouter from "./routers/auth.router.js";
+import donationRouter from "./routers/donations.router.js";
 
 dotenv.config();
 
@@ -10,6 +11,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(authRouter);
+app.use(donationRouter);
 
 const port = process.env.PORT || 4000;
 

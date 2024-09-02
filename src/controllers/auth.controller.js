@@ -16,7 +16,8 @@ export async function signIn(req, res) {
 
   try {
     const tokenData = await authService.signIn(email, password);
-    res.send(tokenData);
+    res.setHeader('Authorization', `Bearer ${tokenData.token}`);
+    res.status(200).send({ token: tokenData.token, username: tokenData.username });
   } catch (error) {
     res.status(error.status || 500).send(error.message);
   }
