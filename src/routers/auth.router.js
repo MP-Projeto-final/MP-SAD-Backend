@@ -6,6 +6,6 @@ import { schemaValidation } from '../middlewares/schema.validation.js';
 const authRouter = express.Router();
 
 authRouter.post('/sign-up', schemaValidation(signUpSchema), signUp);
-authRouter.post('/sign-in', schemaValidation(signInSchema), signIn);
+authRouter.post('/login', schemaValidation(signInSchema), signIn);
 
 export default authRouter;
