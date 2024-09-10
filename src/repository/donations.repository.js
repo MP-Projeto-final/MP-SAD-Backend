@@ -91,34 +91,13 @@ export async function getTrackingByPackageId(pacoteId) {
     return result.rows;
 }
 
-export async function createMedia(pacoteId, tipo, url) {
-    const query = `
-        INSERT INTO Midias (pacote_id, tipo, url)
-        VALUES ($1, $2, $3)
-        RETURNING *;
-    `;
-    const values = [pacoteId, tipo, url];
-    const result = await db.query(query, values);
-    return result.rows[0];
-}
-
-export async function getMediaByPackageId(pacoteId) {
-    const query = `
-        SELECT * FROM Midias
-        WHERE pacote_id = $1;
-    `;
-    const values = [pacoteId];
-    const result = await db.query(query, values);
-    return result.rows;
-}
-
 export async function createPacote(doacaoId, qrCode, status) {
     const query = `
         INSERT INTO Pacotes (doacao_id, qrcode, status, data_status)
         VALUES ($1, $2, $3, NOW())
         RETURNING *;
     `;
-    const qrCodeBase64 = qrCode.toString('base64');  // Converta o buffer para base64
+    const qrCodeBase64 = qrCode.toString('base64'); 
     const values = [doacaoId, qrCodeBase64, status];
     const result = await db.query(query, values);
     return result.rows[0];
@@ -134,3 +113,26 @@ export async function getPacoteQrCodeById(id) {
     const result = await db.query(query, [id]);
     return result.rows[0]?.qrcode;
 }
+
+export async function createMedia(pacoteId, tipo, imagem) {
+    const query = `
+      INSERT INTO Midias (pacote_id, tipo, imagem, data_upload)
+      VALUES ($1, $2, $3, NOW())
+      RETURNING *;
+    `;
+    const values = [pacoteId, tipo, imagem];
+    const result = await db.query(query, values);
+    return result.rows[0];  
+  }
+  
+
+  export async function getMediaByPackageId(pacoteId) {
+    const query = `
+      SELECT id, pacote_id, tipo, imagem, data_upload
+      FROM Midias
+      WHERE pacote_id = $1;
+    `;
+    const values = [pacoteId];
+    const result = await db.query(query, values);
+    return result.rows; 
+  }
