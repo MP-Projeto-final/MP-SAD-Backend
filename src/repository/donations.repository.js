@@ -1,4 +1,5 @@
 import { db } from "../database.js";
+import qrcode from 'qrcode';
 
 export async function createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado) {
     console.log('Creating donation for user:', userId);
@@ -104,4 +105,15 @@ export async function createPacote(doacaoId, qrCode, status) {
     const values = [doacaoId, qrCode, status];
     const result = await db.query(query, values);
     return result.rows[0];
+}
+
+export async function generateQrCodeForDonation(donationId) {
+    const qrCodeBuffer = await qrcode.toBuffer(`Doacao ID: ${donationId}`);
+    return qrCodeBuffer; 
+}
+
+export async function getPacoteQrCodeById(id) {
+    const query = 'SELECT qrcode FROM Pacotes WHERE id = $1';
+    const result = await db.query(query, [id]);
+    return result.rows[0]?.qrcode;
 }

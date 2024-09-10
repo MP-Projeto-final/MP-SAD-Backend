@@ -29,3 +29,13 @@ export async function createDonationWithPackage(userId,descricao, destino_cep, d
 
     return { donation, pacote };
 }
+
+export async function getPacoteQrCode(id) {
+    const qrCodeBinary = await pacoteRepository.getPacoteQrCodeById(id);
+    if (!qrCodeBinary) {
+        const error = new Error('QR code não encontrado');
+        error.status = 404;
+        throw error;
+    }
+    return qrCodeBinary;
+}

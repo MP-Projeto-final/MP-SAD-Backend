@@ -7,8 +7,10 @@ import { createDonationSchema } from '../schemas/donations.schema.js';
 const donationRouter = express.Router();
 
 donationRouter.use(tokenValidation); 
-donationRouter.post('/', schemaValidation(createDonationSchema), createDonation);
+// donationRouter.post('/', schemaValidation(createDonationSchema), createDonation);
 donationRouter.get('/', getDonationsByUser);
 donationRouter.get('/:id', getDonationById);
+donationRouter.post('/donations', tokenValidation, createDonation);
+
 
 export default donationRouter;
