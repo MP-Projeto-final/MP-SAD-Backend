@@ -102,7 +102,8 @@ export async function createPacote(doacaoId, qrCode, status) {
         VALUES ($1, $2, $3, NOW())
         RETURNING *;
     `;
-    const values = [doacaoId, qrCode, status];
+    const qrCodeBase64 = qrCode.toString('base64');  // Converta o buffer para base64
+    const values = [doacaoId, qrCodeBase64, status];
     const result = await db.query(query, values);
     return result.rows[0];
 }
