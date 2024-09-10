@@ -125,8 +125,7 @@ export async function createMedia(pacoteId, tipo, imagem) {
     return result.rows[0];  
   }
   
-
-  export async function getMediaByPackageId(pacoteId) {
+export async function getMediaByPackageId(pacoteId) {
     const query = `
       SELECT id, pacote_id, tipo, imagem, data_upload
       FROM Midias
@@ -135,4 +134,4 @@ export async function createMedia(pacoteId, tipo, imagem) {
     const values = [pacoteId];
     const result = await db.query(query, values);
     return result.rows; 
-  }
+}
