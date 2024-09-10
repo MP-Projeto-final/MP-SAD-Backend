@@ -44,3 +44,17 @@ export async function getPacoteQrCode(id) {
     }
     return qrCodeBinary;
 }
+
+export async function createMedia(pacoteId, tipo, imagemBuffer) {
+    return await donationRepository.createMedia(pacoteId, tipo, imagemBuffer);
+  }
+  
+  export async function getMediaByPackageId(pacoteId) {
+    const midias = await donationRepository.getMediaByPackageId(pacoteId);
+    if (midias.length === 0) {
+      const error = new Error("Nenhuma mídia encontrada para este pacote");
+      error.status = 404;
+      throw error;
+    }
+    return midias;
+  }
