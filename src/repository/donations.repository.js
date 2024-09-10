@@ -123,7 +123,6 @@ export async function updatePacoteStatus(pacoteId, status) {
     const values = [status, pacoteId];
     await db.query(query, values);
 }
-  
 
 export async function createMedia(pacoteId, tipo, buffer) {
     const query = `
@@ -143,4 +142,34 @@ export async function getMediaByPackageId(pacoteId) {
     const values = [pacoteId];
     const result = await db.query(query, values);
     return result.rows; 
+}
+
+export async function getTotalDoacoesFeitas() {
+    const result = await db.query('SELECT COUNT(*) FROM Doacoes');
+    return result.rows[0].count;
+}
+
+export async function getTotalDoacoesRecebidas() {
+    const result = await db.query('SELECT COUNT(*) FROM Pacotes WHERE status = \'entregue\'');
+    return result.rows[0].count;
+}
+
+export async function getLocalidadesDeOrigem() {
+    const result = await db.query('SELECT destino_cidade, destino_estado, COUNT(*) AS total FROM Doacoes GROUP BY destino_cidade, destino_estado');
+    return result.rows;
+}
+
+export async function getLocalidadesDeDestino() {
+    const result = await db.query('SELECT destino_cidade, destino_estado, COUNT(*) AS total FROM Pacotes WHERE status = \'entregue\' GROUP BY destino_cidade, destino_estado');
+    return result.rows;
+}
+
+export async function getItensDoacao() {
+    const result = await db.query('SELECT descricao, COUNT(*) AS total FROM Doacoes GROUP BY descricao');
+    return result.rows;
+}
+
+export async function getItensRecebidos() {
+    const result = await db.query('SELECT descricao, COUNT(*) AS total FROM Pacotes WHERE status = \'entregue\' GROUP BY descricao');
+    return result.rows;
 }
