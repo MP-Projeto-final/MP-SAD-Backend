@@ -1,5 +1,5 @@
 import express from 'express';
-import { createDonation, getDonationsByUser, updatePacoteStatusAndUploadMedia, getDonationById, getPacoteQrCode, uploadMedia, getMediaByPackageId } from '../controllers/donations.controller.js';
+import { createDonation, getStatistics, getDonationsByUser, updatePacoteStatusAndUploadMedia, getDonationById, getPacoteQrCode, uploadMedia, getMediaByPackageId } from '../controllers/donations.controller.js';
 import { schemaValidation } from '../middlewares/schema.validation.js';
 import { tokenValidation } from '../middlewares/token.validation.js';
 import { createDonationSchema } from '../schemas/donations.schema.js';
@@ -15,5 +15,6 @@ donationRouter.get('/pacotes/:id/qrcode', getPacoteQrCode);
 donationRouter.post('/media/upload', upload.single('imagem'), uploadMedia);
 donationRouter.get('/media/:pacoteId', getMediaByPackageId);
 donationRouter.put('/pacotes/:id/status', upload.single('imagem'), updatePacoteStatusAndUploadMedia);
+donationRouter.get('/statistics', getStatistics);
 
 export default donationRouter;
