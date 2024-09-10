@@ -114,16 +114,25 @@ export async function getPacoteQrCodeById(id) {
     return result.rows[0]?.qrcode;
 }
 
-export async function createMedia(pacoteId, tipo, imagem) {
+export async function updatePacoteStatus(pacoteId, status) {
+    const query = `
+      UPDATE Pacotes
+      SET status = $1, data_status = NOW()
+      WHERE id = $2
+    `;
+    const values = [status, pacoteId];
+    await db.query(query, values);
+}
+  
+
+export async function createMedia(pacoteId, tipo, buffer) {
     const query = `
       INSERT INTO Midias (pacote_id, tipo, imagem, data_upload)
       VALUES ($1, $2, $3, NOW())
-      RETURNING *;
     `;
-    const values = [pacoteId, tipo, imagem];
-    const result = await db.query(query, values);
-    return result.rows[0];  
-  }
+    const values = [pacoteId, tipo, buffer];
+    await db.query(query, values);
+}
   
 export async function getMediaByPackageId(pacoteId) {
     const query = `
