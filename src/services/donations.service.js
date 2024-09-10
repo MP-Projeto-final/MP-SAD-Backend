@@ -28,7 +28,7 @@ export async function createDonationWithPackage(userId, descricao, cep, rua, num
     const qrCodeBuffer = await generateQrCodeForDonation(donation.id);
     
     // Cria o pacote associado à doação com o QR code gerado
-    const pacote = await pacoteRepository.createPacote(donation.id, qrCodeBuffer, 'Criado');
+    const pacote = await donationRepository.createPacote(donation.id, qrCodeBuffer, 'Criado');
     
     return { donation, pacote };
 }
@@ -40,7 +40,7 @@ export async function generateQrCodeForDonation(donationId) {
 }
 
 export async function getPacoteQrCode(id) {
-    const qrCodeBinary = await pacoteRepository.getPacoteQrCodeById(id);
+    const qrCodeBinary = await donationRepository.getPacoteQrCodeById(id);
     if (!qrCodeBinary) {
         const error = new Error('QR code não encontrado');
         error.status = 404;
