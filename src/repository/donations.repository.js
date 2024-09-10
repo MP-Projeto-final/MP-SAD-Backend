@@ -94,3 +94,14 @@ export async function getMediaByPackageId(pacoteId) {
     const result = await db.query(query, values);
     return result.rows;
 }
+
+export async function createPacote(doacaoId, qrCode, status) {
+    const query = `
+        INSERT INTO Pacotes (doacao_id, qrcode, status, data_status)
+        VALUES ($1, $2, $3, NOW())
+        RETURNING *;
+    `;
+    const values = [doacaoId, qrCode, status];
+    const result = await db.query(query, values);
+    return result.rows[0];
+}
