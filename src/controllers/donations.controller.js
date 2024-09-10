@@ -77,3 +77,21 @@ export async function getMediaByPackageId(req, res) {
       res.status(error.status || 500).json({ message: error.message });
     }
 }
+
+export async function updatePacoteStatusAndUploadMedia(req, res) {
+    const { id } = req.params; 
+    const { status } = req.body; 
+    const files = req.files; 
+  
+    try {
+      await donationService.updateStatus(id, status);
+
+      if (files && files.length > 0) {
+        await donationService.uploadMediaForPacote(id, files);
+      }
+  
+      res.status(200).send({ message: 'Status atualizado e mídias enviadas com sucesso!' });
+    } catch (error) {
+      res.status(500).send({ error: 'Erro ao atualizar o status e enviar as mídias.' });
+    }
+  }
