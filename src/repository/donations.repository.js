@@ -25,12 +25,28 @@ export async function getDonationsByUser(userId) {
 
 export async function getDonationById(donationId) {
     const query = `
-        SELECT * FROM Doacoes
-        WHERE id = $1;
+        SELECT 
+            d.id as donation_id, 
+            d.descricao, 
+            d.destino_cep, 
+            d.destino_rua, 
+            d.destino_numero, 
+            d.destino_complemento, 
+            d.destino_bairro, 
+            d.destino_cidade, 
+            d.destino_estado, 
+            d.data_enviado,
+            p.id as pacote_id, 
+            p.qrcode, 
+            p.status, 
+            p.data_status 
+        FROM Doacoes d
+        LEFT JOIN Pacotes p ON d.id = p.doacao_id
+        WHERE d.id = $1
     `;
     const values = [donationId];
     const result = await db.query(query, values);
-    return result.rows[0];
+    return result.rows[0]; 
 }
 
 export async function createPackage(donationId, qrcode, status) {
