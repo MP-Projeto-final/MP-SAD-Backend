@@ -13,6 +13,19 @@ import * as donationService from "../services/donations.service.js";
 //     }
 // }
 
+export async function getPacoteQrCode(req, res) {
+    const { id } = req.params;
+
+    try {
+        const qrCodeBinary = await pacoteService.getPacoteQrCode(id);
+        
+        res.setHeader('Content-Type', 'image/png'); 
+        res.send(qrCodeBinary); 
+    } catch (error) {
+        res.status(error.status || 500).send(error.message);
+    }
+}
+
 export async function createDonation(req, res) {
     const { descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado } = req.body;
     const userId = res.locals.user.id; 
