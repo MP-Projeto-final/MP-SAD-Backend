@@ -1,5 +1,6 @@
 import * as donationRepository from "../repository/donations.repository.js";
 import QRCode from 'qrcode';
+import qrcode from 'qrcode';
 
 export async function createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado) {
     return await donationRepository.createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado);
@@ -19,15 +20,23 @@ export async function getDonationById(donationId) {
     return donation;
 }
 
-export async function createDonationWithPackage(userId,descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado) {
-    const donation = await donationRepository.createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado);
+export async function createDonationWithPackage(userId, descricao, cep, rua, numero, complemento, bairro, cidade, estado) {
+    // Cria a doação
+    const donation = await donationRepository.createDonation(userId, descricao, cep, rua, numero, complemento, bairro, cidade, estado);
     
-    const trackingLink = `http://localhost:3000/tracking/${donation.id}`;  
-    const qrCode = await QRCode.toDataURL(trackingLink);  
-   
-    const pacote = await donationRepository.createPacote(donation.id, qrCode, 'Criado');
-
+    // Gera o QR code para a doação
+    const qrCodeBuffer = await generateQrCodeForDonation(donation.id);
+    
+    // Cria o pacote associado à doação com o QR code gerado
+    const pacote = await pacoteRepository.createPacote(donation.id, qrCodeBuffer, 'Criado');
+    
     return { donation, pacote };
+}
+
+// Função para gerar o QR code (deve ficar aqui no service)
+export async function generateQrCodeForDonation(donationId) {
+    const qrCodeBuffer = await qrcode.toBuffer(`Doacao ID: ${donationId}`);
+    return qrCodeBuffer; // Retorna o buffer binário do QR code
 }
 
 export async function getPacoteQrCode(id) {
