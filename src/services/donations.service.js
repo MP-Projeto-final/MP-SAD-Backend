@@ -1,5 +1,4 @@
 import * as donationRepository from "../repository/donations.repository.js";
-import QRCode from 'qrcode';
 import qrcode from 'qrcode';
 
 export async function createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado) {
@@ -47,9 +46,9 @@ export async function getPacoteQrCode(id) {
 
 export async function createMedia(pacoteId, tipo, imagemBuffer) {
     return await donationRepository.createMedia(pacoteId, tipo, imagemBuffer);
-  }
+}
   
-  export async function getMediaByPackageId(pacoteId) {
+export async function getMediaByPackageId(pacoteId) {
     const midias = await donationRepository.getMediaByPackageId(pacoteId);
     if (midias.length === 0) {
       const error = new Error("Nenhuma mídia encontrada para este pacote");
@@ -57,4 +56,16 @@ export async function createMedia(pacoteId, tipo, imagemBuffer) {
       throw error;
     }
     return midias;
-  }
+}
+
+export async function updateStatus(pacoteId, status) {
+    await donationRepository.updatePacoteStatus(pacoteId, status);
+}
+  
+
+export async function uploadMediaForPacote(pacoteId, files) {
+    const mediaUploads = files.map(file => {
+      return donationRepository.createMedia(pacoteId, file.mimetype, file.buffer);
+    });
+    await Promise.all(mediaUploads);
+}
