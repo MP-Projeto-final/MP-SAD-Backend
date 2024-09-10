@@ -8,7 +8,7 @@ import multer from "multer";
 const donationRouter = express.Router();
 const upload = multer();
 
-donationRouter.get('/', tokenValidation, getDonationsByUser);
+donationRouter.get('/my', tokenValidation, getDonationsByUser);
 donationRouter.get('/:id', tokenValidation, getDonationById);
 donationRouter.post('/donations', tokenValidation, createDonation);
 donationRouter.get('/pacotes/:id/qrcode', getPacoteQrCode);
