@@ -27,12 +27,12 @@ export async function getPacoteQrCode(req, res) {
 }
 
 export async function createDonation(req, res) {
-    const { descricao, cep, rua, numero, complemento, bairro, cidade, estado } = req.body;
+    const { descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado } = req.body;
     const userId = res.locals.user.id;
 
     try {
         // Chama o serviço para criar a doação e o pacote
-        const { donation, pacote } = await donationService.createDonationWithPackage(userId, descricao, cep, rua, numero, complemento, bairro, cidade, estado);
+        const { donation, pacote } = await donationService.createDonationWithPackage(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado);
         
         // Envia a resposta com a doação, pacote e QR code já em base64
         res.status(201).json({ donation, pacote, qrCode: `data:image/png;base64,${pacote.qrcode}` });
@@ -57,9 +57,14 @@ export async function getDonationById(req, res) {
     const { id } = req.params;
 
     try {
-        const donation = await donationService.getDonationById(id);
-        res.send(donation);
+        const donationData = await donationService.getDonationById(id);
+
+        if (!donationData) {
+            return res.status(404).json({ message: 'Doação não encontrada' });
+        }
+
+        res.json(donationData);
     } catch (error) {
-        res.status(error.status || 500).send(error.message);
+        res.status(500).json({ message: error.message });
     }
 }
