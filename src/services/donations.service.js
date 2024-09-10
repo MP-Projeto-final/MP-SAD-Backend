@@ -28,7 +28,6 @@ export async function createDonationWithPackage(userId, descricao, destino_cep, 
     return { donation, pacote };
 }
 
-
 export async function generateQrCodeForDonation(donationId) {
     const qrCodeBuffer = await qrcode.toBuffer(`Doacao ID: ${donationId}`);
     return qrCodeBuffer; 
@@ -62,10 +61,27 @@ export async function updateStatus(pacoteId, status) {
     await donationRepository.updatePacoteStatus(pacoteId, status);
 }
   
-
 export async function uploadMediaForPacote(pacoteId, files) {
     const mediaUploads = files.map(file => {
       return donationRepository.createMedia(pacoteId, file.mimetype, file.buffer);
     });
     await Promise.all(mediaUploads);
+}
+
+export async function getStatistics() {
+    const totalDoacoesFeitas = await donationRepository.getTotalDoacoesFeitas();
+    const totalDoacoesRecebidas = await donationRepository.getTotalDoacoesRecebidas();
+    const localidadesDeOrigem = await donationRepository.getLocalidadesDeOrigem();
+    const localidadesDeDestino = await donationRepository.getLocalidadesDeDestino();
+    const itensDoacao = await donationRepository.getItensDoacao();
+    const itensRecebidos = await donationRepository.getItensRecebidos();
+
+    return {
+        totalDoacoesFeitas,
+        totalDoacoesRecebidas,
+        localidadesDeOrigem,
+        localidadesDeDestino,
+        itensDoacao,
+        itensRecebidos
+    };
 }

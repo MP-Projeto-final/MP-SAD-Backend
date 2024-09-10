@@ -65,7 +65,15 @@ export async function uploadMedia(req, res) {
       res.status(error.status || 500).json({ message: error.message });
     }
   }
-  
+
+  export async function getStatistics(req, res) {
+    try {
+        const stats = await donationService.getStatistics();
+        res.status(200).json(stats);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao buscar estatísticas.' });
+    }
+}
 
 export async function getMediaByPackageId(req, res) {
     const { pacoteId } = req.params;
