@@ -12,7 +12,7 @@ export async function findUserByToken(token) {
   
     if (result.rows.length > 0) {
       return {
-        id: result.rows[0].user_id,  // O ID correto do usuário
+        id: result.rows[0].user_id,  
         nome: result.rows[0].nome,
         email: result.rows[0].email,
       };
