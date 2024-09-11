@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: middlewares/schema.validation.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: middlewares/schema.validation.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Middleware function to validate the request body against a provided schema.
+ * 
+ * This middleware uses Joi schema validation to ensure that the request body conforms
+ * to the expected format. If validation fails, it returns a 422 Unprocessable Entity
+ * status with a list of validation error messages.
+ * 
+ * @param {Object} schema - The Joi schema object used to validate the request body.
+ * @returns {Function} - Returns an Express middleware function that validates the request body.
+ */
+export function schemaValidation(schema) {
+    return (req, res, next) => {
+        // Validate the request body against the provided schema, allowing multiple errors.
+        const validation = schema.validate(req.body, { abortEarly: false });
+
+        // If validation fails, map the error details to an array of error messages.
+        if (validation.error) {
+            const errors = validation.error.details.map(detail => detail.message);
+            // Respond with a 422 status code and the array of error messages.
+            return res.status(422).send(errors);
+        }
+
+        // If validation passes, proceed to the next middleware or route handler.
+        next();
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createDonation">createDonation</a></li><li><a href="global.html#createDonationSchema">createDonationSchema</a></li><li><a href="global.html#createDonationWithPackage">createDonationWithPackage</a></li><li><a href="global.html#createDonationWithStatistics">createDonationWithStatistics</a></li><li><a href="global.html#createEstatistica">createEstatistica</a></li><li><a href="global.html#createMedia">createMedia</a></li><li><a href="global.html#createPackage">createPackage</a></li><li><a href="global.html#createPacote">createPacote</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#createTracking">createTracking</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#findUserByEmail">findUserByEmail</a></li><li><a href="global.html#findUserByToken">findUserByToken</a></li><li><a href="global.html#generateQrCodeForDonation">generateQrCodeForDonation</a></li><li><a href="global.html#getDonationById">getDonationById</a></li><li><a href="global.html#getDonationsByUser">getDonationsByUser</a></li><li><a href="global.html#getItensDoacao">getItensDoacao</a></li><li><a href="global.html#getItensRecebidos">getItensRecebidos</a></li><li><a href="global.html#getLocalidadesDeDestino">getLocalidadesDeDestino</a></li><li><a href="global.html#getLocalidadesDeOrigem">getLocalidadesDeOrigem</a></li><li><a href="global.html#getMediaByPackageId">getMediaByPackageId</a></li><li><a href="global.html#getPackagesByDonationId">getPackagesByDonationId</a></li><li><a href="global.html#getPacoteQrCode">getPacoteQrCode</a></li><li><a href="global.html#getPacoteQrCodeById">getPacoteQrCodeById</a></li><li><a href="global.html#getStatistics">getStatistics</a></li><li><a href="global.html#getTotalDoacoesFeitas">getTotalDoacoesFeitas</a></li><li><a href="global.html#getTotalDoacoesRecebidas">getTotalDoacoesRecebidas</a></li><li><a href="global.html#getTrackingByPackageId">getTrackingByPackageId</a></li><li><a href="global.html#insertEstatistica">insertEstatistica</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#logoutUser">logoutUser</a></li><li><a href="global.html#schemaValidation">schemaValidation</a></li><li><a href="global.html#signIn">signIn</a></li><li><a href="global.html#signInSchema">signInSchema</a></li><li><a href="global.html#signUp">signUp</a></li><li><a href="global.html#signUpSchema">signUpSchema</a></li><li><a href="global.html#tokenValidation">tokenValidation</a></li><li><a href="global.html#updateEstatisticas">updateEstatisticas</a></li><li><a href="global.html#updatePacoteStatus">updatePacoteStatus</a></li><li><a href="global.html#updatePacoteStatusAndUploadMedia">updatePacoteStatusAndUploadMedia</a></li><li><a href="global.html#updateStatus">updateStatus</a></li><li><a href="global.html#uploadMedia">uploadMedia</a></li><li><a href="global.html#uploadMediaForPacote">uploadMediaForPacote</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Wed Sep 11 2024 14:39:22 GMT-0300 (Horário Padrão de Brasília)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

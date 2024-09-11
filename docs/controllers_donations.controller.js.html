@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/donations.controller.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/donations.controller.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as donationService from "../services/donations.service.js";
+
+/**
+ * Retrieves a QR code image for a package by its ID.
+ * 
+ * @param {Object} req - Express request object, expects params with package ID.
+ * @param {Object} res - Express response object.
+ * @returns {Buffer} - Returns a PNG image of the QR code.
+ */
+export async function getPacoteQrCode(req, res) {
+    const { id } = req.params;
+
+    try {
+        const qrCodeBinary = await pacoteService.getPacoteQrCode(id);
+        res.setHeader('Content-Type', 'image/png'); 
+        res.send(qrCodeBinary); 
+    } catch (error) {
+        res.status(error.status || 500).send(error.message);
+    }
+}
+
+/**
+ * Creates a donation with associated statistics.
+ * 
+ * @param {Number} userId - ID of the user making the donation.
+ * @param {Object} donationData - Donation data including description, destination address, and origin.
+ * @returns {Object} - Returns the created donation object.
+ */
+export async function createDonationWithStatistics(userId, donationData) {
+    const { descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado } = donationData;
+
+    const donation = await donationService.createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado);
+
+    try {
+        await donationService.createEstatistica(origem_cidade, origem_estado, destino_cidade, destino_estado);
+    } catch (error) {
+        console.error("Erro ao criar estatística:", error);
+    }
+
+    return donation;
+}
+
+/**
+ * Creates a donation, generates a package, and inserts statistics.
+ * 
+ * @param {Object} req - Express request object, expects body with donation details.
+ * @param {Object} res - Express response object.
+ * @returns {Object} - Returns the created donation, package, and QR code.
+ */
+export async function createDonation(req, res) {
+    const { 
+        descricao, 
+        destino_cep, 
+        destino_rua, 
+        destino_numero, 
+        destino_complemento, 
+        destino_bairro, 
+        destino_cidade,  
+        destino_estado, 
+        origem_cidade,   
+        origem_estado    
+    } = req.body;
+
+    const userId = res.locals.user.id; 
+
+    try {
+        const { donation, pacote } = await donationService.createDonationWithPackage(
+            userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+            destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
+        );
+
+        const qrCode = await donationService.generateQrCode(donation.id, pacote.id);
+
+        res.status(201).json({ donation, pacote, qrCode });
+    } catch (error) {
+        console.error("Erro ao criar doação ou inserir estatísticas:", error);
+        res.status(error.status || 500).send(error.message);
+    }
+}
+
+/**
+ * Retrieves all donations made by a specific user.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Array} - Returns a list of donations.
+ */
+export async function getDonationsByUser(req, res) {
+    const userId = res.locals.user.id; 
+
+    try {
+        const donations = await donationService.getDonationsByUser(userId);
+        res.send(donations);
+    } catch (error) {
+        res.status(error.status || 500).send(error.message);
+    }
+}
+
+/**
+ * Retrieves donation details by donation ID.
+ * 
+ * @param {Object} req - Express request object, expects params with donation ID.
+ * @param {Object} res - Express response object.
+ * @returns {Object} - Returns the donation details or a 404 if not found.
+ */
+export async function getDonationById(req, res) {
+    const { id } = req.params;
+
+    try {
+        const donationData = await donationService.getDonationById(id);
+
+        if (!donationData) {
+            return res.status(404).json({ message: 'Doação não encontrada' });
+        }
+
+        res.json(donationData);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+/**
+ * Uploads media (images/videos) for a package.
+ * 
+ * @param {Object} req - Express request object, expects body with package ID and file data.
+ * @param {Object} res - Express response object.
+ * @returns {Object} - Returns the uploaded media details.
+ */
+export async function uploadMedia(req, res) {
+    const { pacoteId } = req.body;
+    const tipo = req.file.mimetype;  
+    const imagemBuffer = req.file.buffer; 
+  
+    try {
+      const midia = await donationService.createMedia(pacoteId, tipo, imagemBuffer);
+      res.status(201).json(midia);  
+    } catch (error) {
+      res.status(error.status || 500).json({ message: error.message });
+    }
+}
+
+/**
+ * Retrieves donation statistics.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Object} - Returns donation statistics data.
+ */
+export async function getStatistics(req, res) {
+    try {
+        const stats = await donationService.getStatistics();
+        res.status(200).json(stats);
+    } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error);
+        res.status(500).json({ message: 'Erro ao buscar estatísticas.' });
+    }
+}
+
+/**
+ * Retrieves media associated with a specific package ID.
+ * 
+ * @param {Object} req - Express request object, expects params with package ID.
+ * @param {Object} res - Express response object.
+ * @returns {Array} - Returns a list of media objects.
+ */
+export async function getMediaByPackageId(req, res) {
+    const { pacoteId } = req.params;
+  
+    try {
+      const midias = await donationService.getMediaByPackageId(pacoteId);
+      res.status(200).json(midias);
+    } catch (error) {
+      res.status(error.status || 500).json({ message: error.message });
+    }
+}
+
+/**
+ * Updates the status of a package and uploads associated media if provided.
+ * 
+ * @param {Object} req - Express request object, expects params with package ID and body with status.
+ * @param {Object} res - Express response object.
+ * @returns {Object} - Returns a success message or error.
+ */
+export async function updatePacoteStatusAndUploadMedia(req, res) {
+    const { id } = req.params; 
+    const { status } = req.body; 
+    const file = req.file;
+
+    try {
+        await donationService.updateStatus(id, status);
+
+        if (file) {
+            await donationService.createMedia(id, file.mimetype, file.buffer); 
+        }
+
+        res.status(200).send({ message: 'Status atualizado e mídia enviada com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao atualizar o status e enviar a mídia:', error);
+        res.status(500).json({ message: 'Erro ao atualizar o status e enviar a mídia.' });
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createDonation">createDonation</a></li><li><a href="global.html#createDonationSchema">createDonationSchema</a></li><li><a href="global.html#createDonationWithPackage">createDonationWithPackage</a></li><li><a href="global.html#createDonationWithStatistics">createDonationWithStatistics</a></li><li><a href="global.html#createEstatistica">createEstatistica</a></li><li><a href="global.html#createMedia">createMedia</a></li><li><a href="global.html#createPackage">createPackage</a></li><li><a href="global.html#createPacote">createPacote</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#createTracking">createTracking</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#findUserByEmail">findUserByEmail</a></li><li><a href="global.html#findUserByToken">findUserByToken</a></li><li><a href="global.html#generateQrCodeForDonation">generateQrCodeForDonation</a></li><li><a href="global.html#getDonationById">getDonationById</a></li><li><a href="global.html#getDonationsByUser">getDonationsByUser</a></li><li><a href="global.html#getItensDoacao">getItensDoacao</a></li><li><a href="global.html#getItensRecebidos">getItensRecebidos</a></li><li><a href="global.html#getLocalidadesDeDestino">getLocalidadesDeDestino</a></li><li><a href="global.html#getLocalidadesDeOrigem">getLocalidadesDeOrigem</a></li><li><a href="global.html#getMediaByPackageId">getMediaByPackageId</a></li><li><a href="global.html#getPackagesByDonationId">getPackagesByDonationId</a></li><li><a href="global.html#getPacoteQrCode">getPacoteQrCode</a></li><li><a href="global.html#getPacoteQrCodeById">getPacoteQrCodeById</a></li><li><a href="global.html#getStatistics">getStatistics</a></li><li><a href="global.html#getTotalDoacoesFeitas">getTotalDoacoesFeitas</a></li><li><a href="global.html#getTotalDoacoesRecebidas">getTotalDoacoesRecebidas</a></li><li><a href="global.html#getTrackingByPackageId">getTrackingByPackageId</a></li><li><a href="global.html#insertEstatistica">insertEstatistica</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#logoutUser">logoutUser</a></li><li><a href="global.html#schemaValidation">schemaValidation</a></li><li><a href="global.html#signIn">signIn</a></li><li><a href="global.html#signInSchema">signInSchema</a></li><li><a href="global.html#signUp">signUp</a></li><li><a href="global.html#signUpSchema">signUpSchema</a></li><li><a href="global.html#tokenValidation">tokenValidation</a></li><li><a href="global.html#updateEstatisticas">updateEstatisticas</a></li><li><a href="global.html#updatePacoteStatus">updatePacoteStatus</a></li><li><a href="global.html#updatePacoteStatusAndUploadMedia">updatePacoteStatusAndUploadMedia</a></li><li><a href="global.html#updateStatus">updateStatus</a></li><li><a href="global.html#uploadMedia">uploadMedia</a></li><li><a href="global.html#uploadMediaForPacote">uploadMediaForPacote</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Wed Sep 11 2024 14:39:22 GMT-0300 (Horário Padrão de Brasília)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
