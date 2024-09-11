@@ -6,7 +6,6 @@ Este projeto é uma API de gerenciamento de doações, utilizando Node.js, Seque
 
 - **Node.js**
 - **Express**
-- **Sequelize** (ORM)
 - **PostgreSQL** (em produção/desenvolvimento)
 - **SQLite** (para testes)
 - **Mocha/Chai** (para testes unitários e de integração)
