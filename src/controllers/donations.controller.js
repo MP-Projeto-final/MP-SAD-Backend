@@ -14,19 +14,33 @@ export async function getPacoteQrCode(req, res) {
 }
 
 export async function createDonation(req, res) {
-    const { descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_estado } = req.body;
-    const userId = res.locals.user.id;
+    const { 
+        descricao, 
+        destino_cep, 
+        destino_rua, 
+        destino_numero, 
+        destino_complemento, 
+        destino_bairro, 
+        destino_cidade,  
+        destino_estado, 
+        origem_cidade,   
+        origem_estado    
+    } = req.body;
+
+    const userId = res.locals.user.id; 
 
     try {
         const { donation, pacote } = await donationService.createDonationWithPackage(
-            userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_estado
+            userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+            destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
         );
-        
+
         res.status(201).json({ donation, pacote, qrCode: `data:image/png;base64,${pacote.qrcode}` });
     } catch (error) {
         res.status(error.status || 500).send(error.message);
     }
 }
+
 
 export async function getDonationsByUser(req, res) {
     const userId = res.locals.user.id; 
@@ -66,16 +80,21 @@ export async function uploadMedia(req, res) {
     } catch (error) {
       res.status(error.status || 500).json({ message: error.message });
     }
-  }
+}
 
-  export async function getStatistics(req, res) {
+
+
+export async function getStatistics(req, res) {
     try {
         const stats = await donationService.getStatistics();
+        console.log("Estatísticas recebidas:", stats); 
         res.status(200).json(stats);
     } catch (error) {
+        console.error("Erro ao buscar estatísticas:", error); 
         res.status(500).json({ message: 'Erro ao buscar estatísticas.' });
     }
 }
+
 
 export async function getMediaByPackageId(req, res) {
     const { pacoteId } = req.params;

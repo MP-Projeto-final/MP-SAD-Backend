@@ -1,17 +1,26 @@
 import { db } from "../database.js";
 import qrcode from 'qrcode';
 
-export async function createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado) {
-    console.log('Creating donation for user:', userId);
+export async function createDonation(
+    userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+    destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
+) {
     const query = `
-        INSERT INTO Doacoes (id_usuario, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        INSERT INTO Doacoes (
+            id_usuario, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+            destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING *;
     `;
-    const values = [userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado];
+    const values = [
+        userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+        destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
+    ];
     const result = await db.query(query, values);
     return result.rows[0];
 }
+
 
 export async function getDonationsByUser(userId) {
     const query = `
@@ -145,9 +154,16 @@ export async function getMediaByPackageId(pacoteId) {
 }
 
 export async function getTotalDoacoesFeitas() {
-    const result = await db.query('SELECT COUNT(*) FROM Doacoes');
-    return result.rows[0].count;
+    try {
+        const result = await db.query('SELECT COUNT(*) FROM Doacoes');
+        console.log("Total de doações feitas:", result.rows[0].count); // Log do resultado
+        return result.rows[0].count;
+    } catch (error) {
+        console.error("Erro ao buscar total de doações feitas:", error);
+        throw error;
+    }
 }
+
 
 export async function getTotalDoacoesRecebidas() {
     const result = await db.query('SELECT COUNT(*) FROM Pacotes WHERE status = \'entregue\'');
@@ -180,5 +196,14 @@ export async function insertEstatisticas(origem, destino) {
         VALUES (NOW(), $1, $2);
     `;
     const values = [origem, destino];
+    await db.query(query, values);
+}
+
+export async function updateEstatisticas(origem_cidade, origem_estado, destino_cidade, destino_estado) {
+    const query = `
+        INSERT INTO Estatisticas (data_hora, origem_cidade, origem, destino_cidade, destino)
+        VALUES (NOW(), $1, $2, $3, $4)
+    `;
+    const values = [origem_cidade, origem_estado, destino_cidade, destino_estado];
     await db.query(query, values);
 }

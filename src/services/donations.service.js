@@ -19,15 +19,6 @@ export async function getDonationById(donationId) {
     return donation;
 }
 
-// export async function createDonationWithPackage(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado) {
-//     const donation = await donationRepository.createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado);
-    
-//     const qrCodeBuffer = await generateQrCodeForDonation(donation.id);
-//     const pacote = await donationRepository.createPacote(donation.id, qrCodeBuffer, 'Criado');
-    
-//     return { donation, pacote };
-// }
-
 export async function generateQrCodeForDonation(donationId) {
     const qrCodeBuffer = await qrcode.toBuffer(`Doacao ID: ${donationId}`);
     return qrCodeBuffer; 
@@ -69,34 +60,48 @@ export async function uploadMediaForPacote(pacoteId, files) {
 }
 
 export async function getStatistics() {
-    const totalDoacoesFeitas = await donationRepository.getTotalDoacoesFeitas();
-    const totalDoacoesRecebidas = await donationRepository.getTotalDoacoesRecebidas();
-    const localidadesDeOrigem = await donationRepository.getLocalidadesDeOrigem();
-    const localidadesDeDestino = await donationRepository.getLocalidadesDeDestino();
-    const itensDoacao = await donationRepository.getItensDoacao();
-    const itensRecebidos = await donationRepository.getItensRecebidos();
+    try {
+        const totalDoacoesFeitas = await donationRepository.getTotalDoacoesFeitas();
+        const totalDoacoesRecebidas = await donationRepository.getTotalDoacoesRecebidas();
+        const localidadesDeOrigem = await donationRepository.getLocalidadesDeOrigem();
+        const localidadesDeDestino = await donationRepository.getLocalidadesDeDestino();
+        const itensDoacao = await donationRepository.getItensDoacao();
+        const itensRecebidos = await donationRepository.getItensRecebidos();
 
-    return {
-        totalDoacoesFeitas,
-        totalDoacoesRecebidas,
-        localidadesDeOrigem,
-        localidadesDeDestino,
-        itensDoacao,
-        itensRecebidos
-    };
+        console.log({
+            totalDoacoesFeitas,
+            totalDoacoesRecebidas,
+            localidadesDeOrigem,
+            localidadesDeDestino,
+            itensDoacao,
+            itensRecebidos,
+        }); // Log das estatísticas
+
+        return {
+            totalDoacoesFeitas,
+            totalDoacoesRecebidas,
+            localidadesDeOrigem,
+            localidadesDeDestino,
+            itensDoacao,
+            itensRecebidos
+        };
+    } catch (error) {
+        console.error("Erro na função getStatistics:", error);
+        throw error;
+    }
 }
-export async function createDonationWithPackage(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_estado) {
-    // Cria a doação
+
+export async function createDonationWithPackage(
+    userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+    destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
+) {
     const donation = await donationRepository.createDonation(
-        userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado
+        userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+        destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
     );
     
-    // Gera o QR Code para a doação
     const qrCodeBuffer = await generateQrCodeForDonation(donation.id);
     const pacote = await donationRepository.createPacote(donation.id, qrCodeBuffer, 'Criado');
     
-    // Insere estatísticas de origem e destino
-    await donationRepository.insertEstatisticas(origem_estado, destino_estado);
-
     return { donation, pacote };
 }
