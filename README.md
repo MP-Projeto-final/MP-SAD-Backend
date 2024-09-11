@@ -58,10 +58,12 @@ Certifique-se de que você tem um banco de dados PostgreSQL rodando e configurad
 
 ### 4. Rodar as migrações e criar o banco de dados
 
-Para aplicar as migrações e sincronizar o banco de dados:
+Ao criar o banco de dados no postgres, rode as queries contidas dentro do arquivo dump.sql.
+
+Para aplicar a seed:
 
 ```bash
-npm run db:migrate
+node seed.js
 ```
 
 ### 5. Executar o servidor
@@ -69,7 +71,7 @@ npm run db:migrate
 Agora, você pode iniciar o servidor da API:
 
 ```bash
-npm start
+npm run dev
 ```
 
 O servidor estará rodando em `http://localhost:4000`.
@@ -93,39 +95,18 @@ NODE_ENV=test
 Para executar os testes, basta rodar o seguinte comando:
 
 ```bash
-npm test
+npx mocha --exit 'tests/**/*.test.js'
 ```
 
 Isso irá rodar os testes utilizando **Mocha** e **Chai** e criar um banco SQLite em memória para testes temporários.
 
 ---
 
-## Estrutura do Projeto
-
-- `src/`: Contém o código-fonte da aplicação (rotas, controladores, modelos).
-- `tests/`: Contém os arquivos de teste utilizando **Mocha/Chai**.
-- `models/`: Contém as definições dos modelos de dados utilizando Sequelize.
-- `controllers/`: Contém os controladores responsáveis por lidar com as requisições.
-- `db.js`: Configura o banco de dados para usar PostgreSQL (desenvolvimento/produção) ou SQLite (testes).
-
----
-
 ## Scripts disponíveis
 
-- `npm start`: Inicia o servidor de desenvolvimento.
-- `npm test`: Executa os testes utilizando Mocha/Chai.
-- `npm run db:migrate`: Aplica as migrações no banco de dados.
+- `npm run dev`: Inicia o servidor de desenvolvimento.
+- `npx mocha --exit 'tests/**/*.test.js'`: Executa os testes utilizando Mocha/Chai.
+- `node seed.js`: Aplica as migrações no banco de dados.
 
 ---
-
-## Contribuindo
-
-Sinta-se à vontade para abrir issues ou pull requests para melhorias e correções no código!
-
----
-
-## Licença
-
-Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
-```
 
