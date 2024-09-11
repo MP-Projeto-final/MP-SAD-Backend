@@ -1,6 +1,5 @@
-// donation.js (Definição de modelo)
 import { DataTypes } from 'sequelize';
-import sequelize from './db.js';
+import sequelize from '../db.js';
 
 const Donation = sequelize.define('Donation', {
   descricao: {
@@ -48,9 +47,8 @@ const Donation = sequelize.define('Donation', {
     allowNull: false,
   }
 }, {
-  // Outras opções do modelo
-  timestamps: true,  // Inclui createdAt e updatedAt por padrão
-  tableName: 'donations',  // Nome da tabela no banco de dados
+  timestamps: true,
+  tableName: 'donations', 
 });
 
 export default Donation;

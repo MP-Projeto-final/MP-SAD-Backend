@@ -1,15 +1,10 @@
 import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { expect } from 'chai';
-import sinon from 'sinon';
-
-// Esta parte pode ser removida se você só quiser ver os testes passando
 import { seedDatabase } from './seed.js';
-import User from './model.js';
-import Donation from './donation.js';
 import sequelize from './db.js';
-import * as donationController from '../src/controllers/donations.controller.js';
-
+import app from '../src/app.js';
+import seedEstatisticas from './seed.js';
 chai.use(chaiAsPromised);
 
 before(async function () {
@@ -22,72 +17,83 @@ after(async function () {
 });
 
 describe('User Model', function () {
+  before(async function () {
+    await sequelize.authenticate();
+    await seedDatabase();
+  });
+
+  after(async function () {
+    await sequelize.close();
+  });
+
   it('Deve criar um novo usuário', async function () {
-    const newUser = { name: 'User2', email: 'user2@example.com' };
+    const newUser = await User.create({ name: 'User2', email: 'user2@example.com' });
     expect(newUser.name).to.equal('User2');
   });
 
   it('Deve buscar um usuário pelo email', async function () {
-    const user = { name: 'Admin', email: 'admin@example.com' };
+    const user = await User.findOne({ where: { email: 'admin@example.com' } });
     expect(user).to.not.be.null;
     expect(user.name).to.equal('Admin');
   });
-  it('Deve criar um novo usuário com nome User3', async function () {
-    const newUser = { name: 'User3', email: 'user3@example.com' };
-    expect(newUser.name).to.equal('User3');
-  });
-
-  it('Deve buscar um usuário com nome Admin2', async function () {
-    const user = { name: 'Admin2', email: 'admin2@example.com' };
-    expect(user).to.not.be.null;
-    expect(user.name).to.equal('Admin2');
-  });
-
-  it('Deve criar um novo usuário com nome User4', async function () {
-    const newUser = { name: 'User4', email: 'user4@example.com' };
-    expect(newUser.name).to.equal('User4');
-  });
-
-  it('Deve buscar um usuário com nome Admin3', async function () {
-    const user = { name: 'Admin3', email: 'admin3@example.com' };
-    expect(user).to.not.be.null;
-    expect(user.name).to.equal('Admin3');
-  });
-
-  it('Deve criar um novo usuário com nome User5', async function () {
-    const newUser = { name: 'User5', email: 'user5@example.com' };
-    expect(newUser.name).to.equal('User5');
-  });
-
-  it('Deve buscar um usuário com nome Admin4', async function () {
-    const user = { name: 'Admin4', email: 'admin4@example.com' };
-    expect(user).to.not.be.null;
-    expect(user.name).to.equal('Admin4');
-  });
 });
 
-describe('Donation Controller', function () {
+describe('Donation Controller - Integração', function () {
+  before(async function () {
+    await sequelize.sync({ force: true });
+    await seedDatabase();
+  });
+
+  after(async function () {
+    await sequelize.close();
+  });
+
   it('Deve criar uma doação e retornar status 201', async function () {
-    expect(true).to.be.true; 
+    const res = await chai.request(app)
+      .post('/donations')
+      .send({
+        descricao: 'Doação de alimentos',
+        destino_cep: '12345-678',
+        destino_rua: 'Rua Exemplo',
+        destino_numero: '123',
+        destino_complemento: '',
+        destino_bairro: 'Bairro Exemplo',
+        destino_cidade: 'São Paulo',
+        destino_estado: 'SP',
+        origem_cidade: 'Rio de Janeiro',
+        origem_estado: 'RJ'
+      });
+
+    expect(res).to.have.status(201);
+    expect(res.body).to.have.property('donation');
+    expect(res.body.donation.descricao).to.equal('Doação de alimentos');
   });
 
   it('Deve retornar todas as doações de um usuário', async function () {
-    expect(true).to.be.true;
+    const res = await chai.request(app)
+      .get('/donations/user')
+      .set('Authorization', 'Bearer <token>');
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('array');
+    expect(res.body[0]).to.have.property('descricao', 'Doação de roupas');
   });
 
-  it('Deve retornar detalhes de uma doação por ID', async function () {
-    expect(true).to.be.true;
+  it('Deve buscar detalhes de uma doação por ID', async function () {
+    const res = await chai.request(app).get('/donations/1');
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('descricao', 'Doação de roupas');
   });
 
   it('Deve retornar 404 quando a doação não for encontrada', async function () {
-    expect(true).to.be.true;
+    const res = await chai.request(app).get('/donations/999');
+    expect(res).to.have.status(404);
+    expect(res.body).to.have.property('message', 'Doação não encontrada');
   });
 
-  it('Deve criar uma doação com sucesso', async function () {
-    expect(true).to.be.true;
-  });
-
-  it('Deve retornar todas as doações', async function () {
-    expect(true).to.be.true;
+  it('Deve retornar estatísticas de doações com sucesso', async function () {
+    const res = await chai.request(app).get('/donations/statistics');
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('totalDonations');
   });
 });
