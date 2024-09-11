@@ -1,6 +1,7 @@
 import * as donationRepository from "../repository/donations.repository.js";
 import qrcode from 'qrcode';
 import QRCode from 'qrcode';
+import { db } from "../database.js";
 
 export async function createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado) {
     return await donationRepository.createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado);
@@ -78,27 +79,110 @@ export async function getStatistics() {
     };
 }
 
-export async function createDonationWithPackage(
-    userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
-    destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
-) {
+
+// export async function createDonationWithPackage(
+//     userId,
+//     descricao,
+//     destino_cep,
+//     destino_rua,
+//     destino_numero,
+//     destino_complemento,
+//     destino_bairro,
+//     destino_cidade,
+//     destino_estado,
+//     origem_cidade,
+//     origem_estado
+//   ) {
+   
+//     const client = await donationRepository.beginTransaction();
+  
+//     try {
+//       const donation = await donationRepository.createDonation(
+//         client,
+//         userId,
+//         descricao,
+//         destino_cep,
+//         destino_rua,
+//         destino_numero,
+//         destino_complemento,
+//         destino_bairro,
+//         destino_cidade,
+//         destino_estado,
+//         origem_cidade,
+//         origem_estado
+//       );
+  
+//       const pacote = await donationRepository.createPacote(client, donation.id);
+  
+//       await donationRepository.insertEstatistica(
+//         client,
+//         origem_cidade,
+//         origem_estado,
+//         destino_cidade,
+//         destino_estado
+//       );
+
+//       await donationRepository.commitTransaction(client);
+  
+//       return { donation, pacote };
+//     } catch (error) {
+//       await donationRepository.rollbackTransaction(client);
+//       throw error;
+//     }
+//   }
+
+// export async function generateQrCode(doacaoId, pacoteId) {
+//     const qrCodeData = `Doacao ID: ${doacaoId}, Pacote ID: ${pacoteId}`;  
+//     try {
+//         const qrCodeImage = await QRCode.toDataURL(qrCodeData);  
+//         return qrCodeImage;
+//     } catch (error) {
+//         throw new Error('Erro ao gerar o QR Code');
+//     }
+// }
+
+// export async function createEstatistica(origem_cidade, origem_estado, destino_cidade, destino_estado) {
+//     const query = `
+//         INSERT INTO Estatisticas (data_hora, origem_cidade, origem_estado, destino_cidade, destino_estado)
+//         VALUES (NOW(), $1, $2, $3, $4)
+//     `;
+    
+//     await db.none(query, [origem_cidade, origem_estado, destino_cidade, destino_estado]);
+// }
+
+
+export async function createDonationWithPackage(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado) {
+    // Cria a doação
     const donation = await donationRepository.createDonation(
         userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
         destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
     );
-    
-    const qrCodeBuffer = await generateQrCodeForDonation(donation.id);
-    const pacote = await donationRepository.createPacote(donation.id, qrCodeBuffer, 'Criado');
-    
+
+    // Cria o pacote vinculado à doação
+    const pacote = await donationRepository.createPackage(donation.id);
+
+    // Insere as estatísticas na tabela
+    await donationRepository.createEstatistica(origem_cidade, origem_estado, destino_cidade, destino_estado);
+
     return { donation, pacote };
 }
 
-export async function generateQrCode(doacaoId, pacoteId) {
-    const qrCodeData = `Doacao ID: ${doacaoId}, Pacote ID: ${pacoteId}`;  
-    try {
-        const qrCodeImage = await QRCode.toDataURL(qrCodeData);  
-        return qrCodeImage;
-    } catch (error) {
-        throw new Error('Erro ao gerar o QR Code');
-    }
+// Função para gerar QR Code
+export async function generateQrCode(donationId, pacoteId) {
+    const qrCodeData = `Doacao ID: ${donationId}, Pacote ID: ${pacoteId}`;
+    return await QRCode.toDataURL(qrCodeData);  // Retorna a URL do QR Code gerado
+}
+
+// Função para criar estatística
+export async function createEstatistica(origem_cidade, origem_estado, destino_cidade, destino_estado) {
+    console.log("Dados para inserir em Estatisticas:", { origem_cidade, origem_estado, destino_cidade, destino_estado });
+
+    const estatisticaQuery = `
+        INSERT INTO Estatisticas (data_hora, origem_cidade, origem_estado, destino_cidade, destino_estado)
+        VALUES (NOW(), $1, $2, $3, $4)
+    `;
+    const estatisticaValues = [origem_cidade, origem_estado, destino_cidade, destino_estado];
+
+    await db.none(estatisticaQuery, estatisticaValues);
+    console.log("Inserção de estatística concluída.");
 }

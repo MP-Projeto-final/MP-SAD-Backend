@@ -13,6 +13,50 @@ export async function getPacoteQrCode(req, res) {
     }
 }
 
+export async function createDonationWithStatistics(userId, donationData) {
+    const { descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado } = donationData;
+
+    const donation = await donationService.createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado);
+
+    try {
+        await donationService.createEstatistica(origem_cidade, origem_estado, destino_cidade, destino_estado);
+    } catch (error) {
+        console.error("Erro ao criar estatística:", error);
+    }
+
+    return donation;
+}
+
+// export async function createDonation(req, res) {
+//     const { 
+//         descricao, 
+//         destino_cep, 
+//         destino_rua, 
+//         destino_numero, 
+//         destino_complemento, 
+//         destino_bairro, 
+//         destino_cidade,  
+//         destino_estado, 
+//         origem_cidade,   
+//         origem_estado    
+//     } = req.body;
+
+//     const userId = res.locals.user.id; 
+
+//     try {
+//         const { donation, pacote } = await donationService.createDonationWithPackage(
+//             userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+//             destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
+//         );
+
+//         const qrCode = await donationService.generateQrCode(donation.id, pacote.id); 
+
+//         res.status(201).json({ donation, pacote, qrCode });
+//     } catch (error) {
+//         res.status(error.status || 500).send(error.message);
+//     }
+// }
+
 export async function createDonation(req, res) {
     const { 
         descricao, 
@@ -30,19 +74,21 @@ export async function createDonation(req, res) {
     const userId = res.locals.user.id; 
 
     try {
+        // Cria a doação, o pacote e insere estatísticas
         const { donation, pacote } = await donationService.createDonationWithPackage(
             userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
             destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
         );
 
-        const qrCode = await donationService.generateQrCode(donation.id, pacote.id); 
+        // Gera o QR Code com os dois IDs
+        const qrCode = await donationService.generateQrCode(donation.id, pacote.id);
 
         res.status(201).json({ donation, pacote, qrCode });
     } catch (error) {
+        console.error("Erro ao criar doação ou inserir estatísticas:", error);
         res.status(error.status || 500).send(error.message);
     }
 }
-
 
 export async function getDonationsByUser(req, res) {
     const userId = res.locals.user.id; 

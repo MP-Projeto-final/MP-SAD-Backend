@@ -1,25 +1,25 @@
 import { db } from "../database.js";
 import qrcode from 'qrcode';
 
-export async function createDonation(
-    userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
-    destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
-) {
-    const query = `
-        INSERT INTO Doacoes (
-            id_usuario, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
-            destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-        RETURNING *;
-    `;
-    const values = [
-        userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
-        destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
-    ];
-    const result = await db.query(query, values);
-    return result.rows[0];
-}
+// export async function createDonation(
+//     userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+//     destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
+// ) {
+//     const query = `
+//         INSERT INTO Doacoes (
+//             id_usuario, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+//             destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
+//         )
+//         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+//         RETURNING *;
+//     `;
+//     const values = [
+//         userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
+//         destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
+//     ];
+//     const result = await db.query(query, values);
+//     return result.rows[0];
+// }
 
 export async function getDonationsByUser(userId) {
     const query = `
@@ -57,16 +57,16 @@ export async function getDonationById(donationId) {
     return result.rows[0]; 
 }
 
-export async function createPackage(donationId, qrcode, status) {
-    const query = `
-        INSERT INTO Pacotes (doacao_id, qrcode, status)
-        VALUES ($1, $2, $3)
-        RETURNING *;
-    `;
-    const values = [donationId, qrcode, status];
-    const result = await db.query(query, values);
-    return result.rows[0];
-}
+// export async function createPackage(donationId, qrcode, status) {
+//     const query = `
+//         INSERT INTO Pacotes (doacao_id, qrcode, status)
+//         VALUES ($1, $2, $3)
+//         RETURNING *;
+//     `;
+//     const values = [donationId, qrcode, status];
+//     const result = await db.query(query, values);
+//     return result.rows[0];
+// }
 
 export async function getPackagesByDonationId(donationId) {
     const query = `
@@ -205,13 +205,14 @@ export async function getItensDoacao() {
     return result.rows;
 }
 
-export async function insertEstatisticas(origem, destino) {
-    const query = `
-        INSERT INTO Estatisticas (data_hora, origem, destino)
-        VALUES (NOW(), $1, $2);
+export async function insertEstatistica(client, origemCidade, origemEstado, destinoCidade, destinoEstado) {
+    const queryText = `
+      INSERT INTO Estatisticas (data_hora, origem_cidade, origem_estado, destino_cidade, destino_estado)
+      VALUES (NOW(), $1, $2, $3, $4)
     `;
-    const values = [origem, destino];
-    await db.query(query, values);
+    const values = [origemCidade, origemEstado, destinoCidade, destinoEstado];
+  
+    await client.query(queryText, values);
 }
 
 export async function updateEstatisticas(origem_cidade, origem_estado, destino_cidade, destino_estado) {
@@ -223,3 +224,34 @@ export async function updateEstatisticas(origem_cidade, origem_estado, destino_c
     await db.query(query, values);
 }
 
+export async function createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado) {
+    const query = `
+        INSERT INTO Doacoes (id_usuario, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        RETURNING *;
+    `;
+    const values = [userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado];
+
+    const result = await db.query(query, values);
+    return result.rows[0];  
+}
+
+
+export async function createPackage(donationId) {
+    const query = `
+        INSERT INTO Pacotes (doacao_id, status, data_status)
+        VALUES ($1, 'Criado', NOW())
+        RETURNING *;
+    `;
+    const result = await db.query(query, [donationId]);
+    return result.rows[0];
+}
+
+export async function createEstatistica(origem_cidade, origem_estado, destino_cidade, destino_estado) {
+    const query = `
+        INSERT INTO Estatisticas (data_hora, origem_cidade, origem_estado, destino_cidade, destino_estado)
+        VALUES (NOW(), $1, $2, $3, $4);
+    `;
+    const values = [origem_cidade, origem_estado, destino_cidade, destino_estado];
+    await db.query(query, values);
+}
