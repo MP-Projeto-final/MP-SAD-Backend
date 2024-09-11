@@ -180,15 +180,30 @@ export async function getLocalidadesDeDestino() {
     return result.rows;
 }
 
-export async function getItensDoacao() {
-    const result = await db.query('SELECT descricao, COUNT(*) AS total FROM Doacoes GROUP BY descricao');
+export async function getItensRecebidos() {
+    const query = `
+      SELECT descricao, COUNT(*) AS total 
+      FROM Doacoes
+      WHERE id IN (SELECT doacao_id FROM Pacotes WHERE status = 'entregue')
+      GROUP BY descricao
+    `;
+    const result = await db.query(query);
     return result.rows;
 }
 
-export async function getItensRecebidos() {
-    const result = await db.query('SELECT descricao, COUNT(*) AS total FROM Pacotes WHERE status = \'entregue\' GROUP BY descricao');
+export async function getItensDoacao() {
+    const query = `
+        SELECT descricao, COUNT(*) AS total 
+        FROM Doacoes
+        GROUP BY descricao;
+    `;
+    const result = await db.query(query);
     return result.rows;
 }
+
+
+
+
 
 export async function insertEstatisticas(origem, destino) {
     const query = `
