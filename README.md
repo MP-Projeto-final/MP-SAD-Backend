@@ -1,6 +1,6 @@
 # Projeto de Doações - Backend
 
-Este projeto é uma API de gerenciamento de doações, utilizando Node.js, Sequelize, PostgreSQL (ou SQLite para testes), e integrações com um banco de dados.
+Este projeto é uma API de gerenciamento de doações, utilizando Node.js, PostgreSQL (ou SQLite para testes), e integrações com um banco de dados.
 
 ## Tecnologias utilizadas
 
