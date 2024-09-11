@@ -19,14 +19,14 @@ export async function getDonationById(donationId) {
     return donation;
 }
 
-export async function createDonationWithPackage(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado) {
-    const donation = await donationRepository.createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado);
+// export async function createDonationWithPackage(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado) {
+//     const donation = await donationRepository.createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado);
     
-    const qrCodeBuffer = await generateQrCodeForDonation(donation.id);
-    const pacote = await donationRepository.createPacote(donation.id, qrCodeBuffer, 'Criado');
+//     const qrCodeBuffer = await generateQrCodeForDonation(donation.id);
+//     const pacote = await donationRepository.createPacote(donation.id, qrCodeBuffer, 'Criado');
     
-    return { donation, pacote };
-}
+//     return { donation, pacote };
+// }
 
 export async function generateQrCodeForDonation(donationId) {
     const qrCodeBuffer = await qrcode.toBuffer(`Doacao ID: ${donationId}`);
@@ -84,4 +84,19 @@ export async function getStatistics() {
         itensDoacao,
         itensRecebidos
     };
+}
+export async function createDonationWithPackage(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_estado) {
+    // Cria a doação
+    const donation = await donationRepository.createDonation(
+        userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado
+    );
+    
+    // Gera o QR Code para a doação
+    const qrCodeBuffer = await generateQrCodeForDonation(donation.id);
+    const pacote = await donationRepository.createPacote(donation.id, qrCodeBuffer, 'Criado');
+    
+    // Insere estatísticas de origem e destino
+    await donationRepository.insertEstatisticas(origem_estado, destino_estado);
+
+    return { donation, pacote };
 }

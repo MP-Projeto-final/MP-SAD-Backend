@@ -14,11 +14,13 @@ export async function getPacoteQrCode(req, res) {
 }
 
 export async function createDonation(req, res) {
-    const { descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado } = req.body;
+    const { descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_estado } = req.body;
     const userId = res.locals.user.id;
 
     try {
-        const { donation, pacote } = await donationService.createDonationWithPackage(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado);
+        const { donation, pacote } = await donationService.createDonationWithPackage(
+            userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_estado
+        );
         
         res.status(201).json({ donation, pacote, qrCode: `data:image/png;base64,${pacote.qrcode}` });
     } catch (error) {
