@@ -1,11 +1,17 @@
 import * as donationService from "../services/donations.service.js";
 
+/**
+ * Retrieves a QR code image for a package by its ID.
+ * 
+ * @param {Object} req - Express request object, expects params with package ID.
+ * @param {Object} res - Express response object.
+ * @returns {Buffer} - Returns a PNG image of the QR code.
+ */
 export async function getPacoteQrCode(req, res) {
     const { id } = req.params;
 
     try {
         const qrCodeBinary = await pacoteService.getPacoteQrCode(id);
-        
         res.setHeader('Content-Type', 'image/png'); 
         res.send(qrCodeBinary); 
     } catch (error) {
@@ -13,6 +19,13 @@ export async function getPacoteQrCode(req, res) {
     }
 }
 
+/**
+ * Creates a donation with associated statistics.
+ * 
+ * @param {Number} userId - ID of the user making the donation.
+ * @param {Object} donationData - Donation data including description, destination address, and origin.
+ * @returns {Object} - Returns the created donation object.
+ */
 export async function createDonationWithStatistics(userId, donationData) {
     const { descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado } = donationData;
 
@@ -27,6 +40,13 @@ export async function createDonationWithStatistics(userId, donationData) {
     return donation;
 }
 
+/**
+ * Creates a donation, generates a package, and inserts statistics.
+ * 
+ * @param {Object} req - Express request object, expects body with donation details.
+ * @param {Object} res - Express response object.
+ * @returns {Object} - Returns the created donation, package, and QR code.
+ */
 export async function createDonation(req, res) {
     const { 
         descricao, 
@@ -44,13 +64,11 @@ export async function createDonation(req, res) {
     const userId = res.locals.user.id; 
 
     try {
-        // Cria a doação, o pacote e insere estatísticas
         const { donation, pacote } = await donationService.createDonationWithPackage(
             userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
             destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
         );
 
-        // Gera o QR Code com os dois IDs
         const qrCode = await donationService.generateQrCode(donation.id, pacote.id);
 
         res.status(201).json({ donation, pacote, qrCode });
@@ -60,6 +78,13 @@ export async function createDonation(req, res) {
     }
 }
 
+/**
+ * Retrieves all donations made by a specific user.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Array} - Returns a list of donations.
+ */
 export async function getDonationsByUser(req, res) {
     const userId = res.locals.user.id; 
 
@@ -71,6 +96,13 @@ export async function getDonationsByUser(req, res) {
     }
 }
 
+/**
+ * Retrieves donation details by donation ID.
+ * 
+ * @param {Object} req - Express request object, expects params with donation ID.
+ * @param {Object} res - Express response object.
+ * @returns {Object} - Returns the donation details or a 404 if not found.
+ */
 export async function getDonationById(req, res) {
     const { id } = req.params;
 
@@ -87,6 +119,13 @@ export async function getDonationById(req, res) {
     }
 }
 
+/**
+ * Uploads media (images/videos) for a package.
+ * 
+ * @param {Object} req - Express request object, expects body with package ID and file data.
+ * @param {Object} res - Express response object.
+ * @returns {Object} - Returns the uploaded media details.
+ */
 export async function uploadMedia(req, res) {
     const { pacoteId } = req.body;
     const tipo = req.file.mimetype;  
@@ -100,6 +139,13 @@ export async function uploadMedia(req, res) {
     }
 }
 
+/**
+ * Retrieves donation statistics.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Object} - Returns donation statistics data.
+ */
 export async function getStatistics(req, res) {
     try {
         const stats = await donationService.getStatistics();
@@ -110,6 +156,13 @@ export async function getStatistics(req, res) {
     }
 }
 
+/**
+ * Retrieves media associated with a specific package ID.
+ * 
+ * @param {Object} req - Express request object, expects params with package ID.
+ * @param {Object} res - Express response object.
+ * @returns {Array} - Returns a list of media objects.
+ */
 export async function getMediaByPackageId(req, res) {
     const { pacoteId } = req.params;
   
@@ -121,6 +174,13 @@ export async function getMediaByPackageId(req, res) {
     }
 }
 
+/**
+ * Updates the status of a package and uploads associated media if provided.
+ * 
+ * @param {Object} req - Express request object, expects params with package ID and body with status.
+ * @param {Object} res - Express response object.
+ * @returns {Object} - Returns a success message or error.
+ */
 export async function updatePacoteStatusAndUploadMedia(req, res) {
     const { id } = req.params; 
     const { status } = req.body; 
@@ -136,6 +196,6 @@ export async function updatePacoteStatusAndUploadMedia(req, res) {
         res.status(200).send({ message: 'Status atualizado e mídia enviada com sucesso!' });
     } catch (error) {
         console.error('Erro ao atualizar o status e enviar a mídia:', error);
-        res.status(500).send({ error: 'Erro ao atualizar o status e enviar a mídia.' });
+        res.status(500).json({ message: 'Erro ao atualizar o status e enviar a mídia.' });
     }
 }

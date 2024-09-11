@@ -5,6 +5,10 @@ import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import sinon from 'sinon';
 
+/**
+ * Proxies for the repository and utility modules to stub methods.
+ * This allows us to control and assert method calls within the tests.
+ */
 const authRepositoryProxy = new Proxy(authRepository, {
   get(target, prop) {
     return sinon.stub(target, prop);
@@ -23,6 +27,10 @@ const uuidProxy = new Proxy(uuid, {
   }
 });
 
+/**
+ * Test case for signUp function.
+ * Verifies that an error is thrown if the email is already registered.
+ */
 test('signUp - Deve lançar um erro se o email já estiver cadastrado', async (t) => {
   authRepositoryProxy.findUserByEmail.resolves({ id: 1, email: 'existing@example.com' });
   
@@ -37,6 +45,10 @@ test('signUp - Deve lançar um erro se o email já estiver cadastrado', async (t
   t.end();
 });
 
+/**
+ * Test case for signUp function.
+ * Verifies that a new user is created if the email is not already registered.
+ */
 test('signUp - Deve criar um novo usuário se o email não estiver cadastrado', async (t) => {
   authRepositoryProxy.findUserByEmail.resolves(null);
   authRepositoryProxy.createUser.resolves(1);
@@ -52,6 +64,10 @@ test('signUp - Deve criar um novo usuário se o email não estiver cadastrado', 
   t.end();
 });
 
+/**
+ * Test case for signIn function.
+ * Verifies that an error is thrown if the email is not registered.
+ */
 test('signIn - Deve lançar um erro se o email não estiver cadastrado', async (t) => {
   authRepositoryProxy.findUserByEmail.resolves(null);
   
@@ -66,6 +82,10 @@ test('signIn - Deve lançar um erro se o email não estiver cadastrado', async (
   t.end();
 });
 
+/**
+ * Test case for signIn function.
+ * Verifies that an error is thrown if the password is incorrect.
+ */
 test('signIn - Deve lançar um erro se a senha estiver incorreta', async (t) => {
   authRepositoryProxy.findUserByEmail.resolves({ id: 1, email: 'existing@example.com', senha: 'hashedpassword' });
   bcryptProxy.compare.resolves(false);
@@ -82,6 +102,10 @@ test('signIn - Deve lançar um erro se a senha estiver incorreta', async (t) => 
   t.end();
 });
 
+/**
+ * Test case for signIn function.
+ * Verifies that a token and username are returned if login is successful.
+ */
 test('signIn - Deve retornar um token e o nome do usuário se o login for bem-sucedido', async (t) => {
   authRepositoryProxy.findUserByEmail.resolves({ id: 1, email: 'existing@example.com', senha: 'hashedpassword', nome: 'Test User' });
   bcryptProxy.compare.resolves(true);
@@ -99,6 +123,10 @@ test('signIn - Deve retornar um token e o nome do usuário se o login for bem-su
   t.end();
 });
 
+/**
+ * Test case for logout function.
+ * Verifies that the user session is removed successfully.
+ */
 test('logout - Deve remover a sessão do usuário', async (t) => {
   authRepositoryProxy.logoutUser.resolves(1);
 

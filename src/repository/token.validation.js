@@ -1,5 +1,14 @@
 import { db } from "../database.js";
 
+/**
+ * Finds a user by their session token.
+ * 
+ * This function retrieves user details based on the provided token. It joins the `usuarios` table with the `sessions` table
+ * to match the token and return the user's ID, name, and email.
+ * 
+ * @param {string} token - The session token associated with the user.
+ * @returns {Object|null} - Returns an object containing user details (ID, name, email) if a matching token is found, otherwise returns null.
+ */
 export async function findUserByToken(token) {
     const query = `
       SELECT usuarios.id AS user_id, usuarios.nome, usuarios.email
@@ -18,4 +27,4 @@ export async function findUserByToken(token) {
       };
     }
     return null;
-  }
+}
