@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/auth.service.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/auth.service.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as userRepository from "../repository/auth.repository.js";
+import bcrypt from "bcrypt";
+import { v4 as uuid } from "uuid";
+
+/**
+ * Registers a new user with the provided details.
+ * 
+ * This function first checks if the email is already registered. If not, it hashes the provided password
+ * and creates a new user in the database.
+ * 
+ * @param {string} email - The email address of the user. It must be unique.
+ * @param {string} name - The name of the user.
+ * @param {string} password - The password of the user. It will be hashed before saving.
+ * @param {string} phone - The phone number of the user.
+ * 
+ * @throws {Error} Throws an error if the email is already registered. The error will have a status of 409.
+ */
+export async function signUp(email, name, password, phone) {
+  const existingUser = await userRepository.findUserByEmail(email);
+  if (existingUser) {
+    const error = new Error("Email já cadastrado!");
+    error.status = 409;
+    throw error;
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await userRepository.createUser(email, hashedPassword, name, phone);
+}
+
+/**
+ * Logs in a user with the provided email and password.
+ * 
+ * This function checks if the user exists and if the provided password matches the hashed password in the database.
+ * If the credentials are correct, it creates a session and returns a token.
+ * 
+ * @param {string} email - The email address of the user.
+ * @param {string} password - The password of the user.
+ * 
+ * @returns {Object} Returns an object containing the token, userId, and username.
+ * 
+ * @throws {Error} Throws an error if the email is not registered (404) or if the password is incorrect (401).
+ */
+export async function signIn(email, password) {
+  const user = await userRepository.findUserByEmail(email);
+  if (!user) {
+    const error = new Error("E-mail não cadastrado!");
+    error.status = 404;
+    throw error;
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(password, user.senha);
+  if (!isPasswordCorrect) {
+    const error = new Error("Senha incorreta!");
+    error.status = 401;
+    throw error;
+  }
+
+  const token = uuid();
+  await userRepository.createSession(token, user.id);
+
+  console.log("Usuário logado com sucesso, ID do usuário:", user.id);
+  return { token, userId: user.id, username: user.nome }
+}
+
+/**
+ * Logs out a user by invalidating their session.
+ * 
+ * This function removes the session associated with the given userId and token from the database.
+ * 
+ * @param {number} userId - The ID of the user to log out.
+ * @param {string} token - The session token to invalidate.
+ */
+export async function logout(userId, token) {
+  await userRepository.logoutUser(userId, token);
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createDonation">createDonation</a></li><li><a href="global.html#createDonationSchema">createDonationSchema</a></li><li><a href="global.html#createDonationWithPackage">createDonationWithPackage</a></li><li><a href="global.html#createDonationWithStatistics">createDonationWithStatistics</a></li><li><a href="global.html#createEstatistica">createEstatistica</a></li><li><a href="global.html#createMedia">createMedia</a></li><li><a href="global.html#createPackage">createPackage</a></li><li><a href="global.html#createPacote">createPacote</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#createTracking">createTracking</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#findUserByEmail">findUserByEmail</a></li><li><a href="global.html#findUserByToken">findUserByToken</a></li><li><a href="global.html#generateQrCodeForDonation">generateQrCodeForDonation</a></li><li><a href="global.html#getDonationById">getDonationById</a></li><li><a href="global.html#getDonationsByUser">getDonationsByUser</a></li><li><a href="global.html#getItensDoacao">getItensDoacao</a></li><li><a href="global.html#getItensRecebidos">getItensRecebidos</a></li><li><a href="global.html#getLocalidadesDeDestino">getLocalidadesDeDestino</a></li><li><a href="global.html#getLocalidadesDeOrigem">getLocalidadesDeOrigem</a></li><li><a href="global.html#getMediaByPackageId">getMediaByPackageId</a></li><li><a href="global.html#getPackagesByDonationId">getPackagesByDonationId</a></li><li><a href="global.html#getPacoteQrCode">getPacoteQrCode</a></li><li><a href="global.html#getPacoteQrCodeById">getPacoteQrCodeById</a></li><li><a href="global.html#getStatistics">getStatistics</a></li><li><a href="global.html#getTotalDoacoesFeitas">getTotalDoacoesFeitas</a></li><li><a href="global.html#getTotalDoacoesRecebidas">getTotalDoacoesRecebidas</a></li><li><a href="global.html#getTrackingByPackageId">getTrackingByPackageId</a></li><li><a href="global.html#insertEstatistica">insertEstatistica</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#logoutUser">logoutUser</a></li><li><a href="global.html#schemaValidation">schemaValidation</a></li><li><a href="global.html#signIn">signIn</a></li><li><a href="global.html#signInSchema">signInSchema</a></li><li><a href="global.html#signUp">signUp</a></li><li><a href="global.html#signUpSchema">signUpSchema</a></li><li><a href="global.html#tokenValidation">tokenValidation</a></li><li><a href="global.html#updateEstatisticas">updateEstatisticas</a></li><li><a href="global.html#updatePacoteStatus">updatePacoteStatus</a></li><li><a href="global.html#updatePacoteStatusAndUploadMedia">updatePacoteStatusAndUploadMedia</a></li><li><a href="global.html#updateStatus">updateStatus</a></li><li><a href="global.html#uploadMedia">uploadMedia</a></li><li><a href="global.html#uploadMediaForPacote">uploadMediaForPacote</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Wed Sep 11 2024 14:39:22 GMT-0300 (Horário Padrão de Brasília)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

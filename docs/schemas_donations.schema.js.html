@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: schemas/donations.schema.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: schemas/donations.schema.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import joi from "joi";
+
+/**
+ * Joi schema for creating a donation.
+ * 
+ * This schema validates the data for creating a new donation.
+ * 
+ * @property {string} descricao - Description of the donation. Must be a string with a maximum length of 300 characters and is required.
+ * @property {string} destino_cep - Destination ZIP code. Must be a string with exactly 8 characters and is required.
+ * @property {string} destino_rua - Destination street. Must be a string with a maximum length of 255 characters and is required.
+ * @property {string} destino_numero - Destination number. Must be a string with a maximum length of 50 characters and is required.
+ * @property {string} [destino_complemento] - Destination complement. Optional field that can be a string with a maximum length of 255 characters or an empty string.
+ * @property {string} destino_bairro - Destination neighborhood. Must be a string with a maximum length of 255 characters and is required.
+ * @property {string} destino_cidade - Destination city. Must be a string with a maximum length of 255 characters and is required.
+ * @property {string} destino_estado - Destination state. Must be a string with exactly 2 characters (usually an abbreviation) and is required.
+ */
+export const createDonationSchema = joi.object({
+  descricao: joi.string().max(300).required(),  
+  destino_cep: joi.string().length(8).required(), 
+  destino_rua: joi.string().max(255).required(),  
+  destino_numero: joi.string().max(50).required(), 
+  destino_complemento: joi.string().max(255).optional().allow(""),  
+  destino_bairro: joi.string().max(255).required(),  
+  destino_cidade: joi.string().max(255).required(),  
+  destino_estado: joi.string().length(2).required(),  
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createDonation">createDonation</a></li><li><a href="global.html#createDonationSchema">createDonationSchema</a></li><li><a href="global.html#createDonationWithPackage">createDonationWithPackage</a></li><li><a href="global.html#createDonationWithStatistics">createDonationWithStatistics</a></li><li><a href="global.html#createEstatistica">createEstatistica</a></li><li><a href="global.html#createMedia">createMedia</a></li><li><a href="global.html#createPackage">createPackage</a></li><li><a href="global.html#createPacote">createPacote</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#createTracking">createTracking</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#findUserByEmail">findUserByEmail</a></li><li><a href="global.html#findUserByToken">findUserByToken</a></li><li><a href="global.html#generateQrCodeForDonation">generateQrCodeForDonation</a></li><li><a href="global.html#getDonationById">getDonationById</a></li><li><a href="global.html#getDonationsByUser">getDonationsByUser</a></li><li><a href="global.html#getItensDoacao">getItensDoacao</a></li><li><a href="global.html#getItensRecebidos">getItensRecebidos</a></li><li><a href="global.html#getLocalidadesDeDestino">getLocalidadesDeDestino</a></li><li><a href="global.html#getLocalidadesDeOrigem">getLocalidadesDeOrigem</a></li><li><a href="global.html#getMediaByPackageId">getMediaByPackageId</a></li><li><a href="global.html#getPackagesByDonationId">getPackagesByDonationId</a></li><li><a href="global.html#getPacoteQrCode">getPacoteQrCode</a></li><li><a href="global.html#getPacoteQrCodeById">getPacoteQrCodeById</a></li><li><a href="global.html#getStatistics">getStatistics</a></li><li><a href="global.html#getTotalDoacoesFeitas">getTotalDoacoesFeitas</a></li><li><a href="global.html#getTotalDoacoesRecebidas">getTotalDoacoesRecebidas</a></li><li><a href="global.html#getTrackingByPackageId">getTrackingByPackageId</a></li><li><a href="global.html#insertEstatistica">insertEstatistica</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#logoutUser">logoutUser</a></li><li><a href="global.html#schemaValidation">schemaValidation</a></li><li><a href="global.html#signIn">signIn</a></li><li><a href="global.html#signInSchema">signInSchema</a></li><li><a href="global.html#signUp">signUp</a></li><li><a href="global.html#signUpSchema">signUpSchema</a></li><li><a href="global.html#tokenValidation">tokenValidation</a></li><li><a href="global.html#updateEstatisticas">updateEstatisticas</a></li><li><a href="global.html#updatePacoteStatus">updatePacoteStatus</a></li><li><a href="global.html#updatePacoteStatusAndUploadMedia">updatePacoteStatusAndUploadMedia</a></li><li><a href="global.html#updateStatus">updateStatus</a></li><li><a href="global.html#uploadMedia">uploadMedia</a></li><li><a href="global.html#uploadMediaForPacote">uploadMediaForPacote</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Wed Sep 11 2024 14:39:22 GMT-0300 (Horário Padrão de Brasília)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
