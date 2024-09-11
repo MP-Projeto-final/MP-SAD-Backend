@@ -21,7 +21,6 @@ export async function createDonation(
     return result.rows[0];
 }
 
-
 export async function getDonationsByUser(userId) {
     const query = `
         SELECT * FROM Doacoes
@@ -154,16 +153,9 @@ export async function getMediaByPackageId(pacoteId) {
 }
 
 export async function getTotalDoacoesFeitas() {
-    try {
-        const result = await db.query('SELECT COUNT(*) FROM Doacoes');
-        console.log("Total de doações feitas:", result.rows[0].count); // Log do resultado
-        return result.rows[0].count;
-    } catch (error) {
-        console.error("Erro ao buscar total de doações feitas:", error);
-        throw error;
-    }
+    const result = await db.query('SELECT COUNT(*) FROM Doacoes');
+    return result.rows[0].count;
 }
-
 
 export async function getTotalDoacoesRecebidas() {
     const result = await db.query('SELECT COUNT(*) FROM Pacotes WHERE status = \'entregue\'');
@@ -171,12 +163,20 @@ export async function getTotalDoacoesRecebidas() {
 }
 
 export async function getLocalidadesDeOrigem() {
-    const result = await db.query('SELECT destino_cidade, destino_estado, COUNT(*) AS total FROM Doacoes GROUP BY destino_cidade, destino_estado');
+    const result = await db.query(`
+        SELECT origem_cidade, origem_estado, COUNT(*) AS total 
+        FROM Estatisticas 
+        GROUP BY origem_cidade, origem_estado
+    `);
     return result.rows;
 }
 
 export async function getLocalidadesDeDestino() {
-    const result = await db.query('SELECT destino_cidade, destino_estado, COUNT(*) AS total FROM Pacotes WHERE status = \'entregue\' GROUP BY destino_cidade, destino_estado');
+    const result = await db.query(`
+        SELECT destino_cidade, destino_estado, COUNT(*) AS total 
+        FROM Estatisticas 
+        GROUP BY destino_cidade, destino_estado
+    `);
     return result.rows;
 }
 
