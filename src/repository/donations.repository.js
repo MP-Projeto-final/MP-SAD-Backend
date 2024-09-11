@@ -23,8 +23,12 @@ import qrcode from 'qrcode';
 
 export async function getDonationsByUser(userId) {
     const query = `
-        SELECT * FROM Doacoes
-        WHERE id_usuario = $1;
+        SELECT d.id AS donation_id, d.descricao, d.destino_cep, d.destino_rua, d.destino_numero, 
+            d.destino_complemento, d.destino_bairro, d.destino_cidade, d.destino_estado,
+            p.id AS pacote_id, p.status AS pacote_status
+        FROM Doacoes d
+        JOIN Pacotes p ON d.id = p.doacao_id
+        WHERE d.id_usuario = $1;
     `;
     const values = [userId];
     const result = await db.query(query, values);
