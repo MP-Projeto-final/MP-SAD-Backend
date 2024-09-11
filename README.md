@@ -25,8 +25,8 @@ Este projeto é uma API de gerenciamento de doações, utilizando Node.js, Seque
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/projeto-doacoes.git
-cd projeto-doacoes
+git clone [https://github.com/seu-usuario/projeto-doacoes.git](https://github.com/MP-Projeto-final/MP-SAD-Backend)
+cd 
 ```
 
 ### 2. Instale as dependências
@@ -51,7 +51,7 @@ DB_NAME=nome_do_banco
 NODE_ENV=development
 
 # Porta da aplicação
-PORT=3000
+PORT=4000
 ```
 
 Certifique-se de que você tem um banco de dados PostgreSQL rodando e configurado conforme as variáveis acima.
@@ -72,7 +72,7 @@ Agora, você pode iniciar o servidor da API:
 npm start
 ```
 
-O servidor estará rodando em `http://localhost:3000`.
+O servidor estará rodando em `http://localhost:4000`.
 
 ---
 
