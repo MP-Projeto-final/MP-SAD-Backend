@@ -99,21 +99,20 @@ export async function getTrackingByPackageId(pacoteId) {
     return result.rows;
 }
 
-export async function createPacote(doacaoId, qrCode, status) {
+export async function createPacote(doacaoId, qrCodeBuffer, status) {
     const query = `
         INSERT INTO Pacotes (doacao_id, qrcode, status, data_status)
         VALUES ($1, $2, $3, NOW())
         RETURNING *;
     `;
-    const qrCodeBase64 = qrCode.toString('base64'); 
-    const values = [doacaoId, qrCodeBase64, status];
+    const values = [doacaoId, qrCodeBuffer, status]; 
     const result = await db.query(query, values);
-    return result.rows[0];
+    return result.rows[0]; 
 }
 
-export async function generateQrCodeForDonation(donationId) {
-    const qrCodeBuffer = await qrcode.toBuffer(`Doacao ID: ${donationId}`);
-    return qrCodeBuffer; 
+export async function generateQrCodeForDonation(pacoteId) {
+    const qrCodeBuffer = await qrcode.toBuffer(`Pacote ID: ${pacoteId}`);  
+    return qrCodeBuffer;
 }
 
 export async function getPacoteQrCodeById(id) {
@@ -124,12 +123,17 @@ export async function getPacoteQrCodeById(id) {
 
 export async function updatePacoteStatus(pacoteId, status) {
     const query = `
-      UPDATE Pacotes
-      SET status = $1, data_status = NOW()
-      WHERE id = $2
-    `;
-    const values = [status, pacoteId];
-    await db.query(query, values);
+    UPDATE Pacotes
+    SET status = $1, data_status = NOW()
+    WHERE id = $2
+  `;
+  const values = [status, pacoteId];
+
+  console.log('Executando query:', query, 'Valores:', values);
+
+  const result = await db.query(query, values);
+
+  console.log('Resultado da query:', result);
 }
 
 export async function createMedia(pacoteId, tipo, buffer) {
@@ -201,10 +205,6 @@ export async function getItensDoacao() {
     return result.rows;
 }
 
-
-
-
-
 export async function insertEstatisticas(origem, destino) {
     const query = `
         INSERT INTO Estatisticas (data_hora, origem, destino)
@@ -222,3 +222,4 @@ export async function updateEstatisticas(origem_cidade, origem_estado, destino_c
     const values = [origem_cidade, origem_estado, destino_cidade, destino_estado];
     await db.query(query, values);
 }
+

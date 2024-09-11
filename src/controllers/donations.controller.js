@@ -35,11 +35,14 @@ export async function createDonation(req, res) {
             destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
         );
 
-        res.status(201).json({ donation, pacote, qrCode: `data:image/png;base64,${pacote.qrcode}` });
+        const qrCode = await donationService.generateQrCode(donation.id, pacote.id); 
+
+        res.status(201).json({ donation, pacote, qrCode });
     } catch (error) {
         res.status(error.status || 500).send(error.message);
     }
 }
+
 
 export async function getDonationsByUser(req, res) {
     const userId = res.locals.user.id; 
@@ -105,7 +108,7 @@ export async function getMediaByPackageId(req, res) {
 export async function updatePacoteStatusAndUploadMedia(req, res) {
     const { id } = req.params; 
     const { status } = req.body; 
-    const files = req.files; 
+    const files = req.files;
   
     try {
       await donationService.updateStatus(id, status);
@@ -119,3 +122,5 @@ export async function updatePacoteStatusAndUploadMedia(req, res) {
       res.status(500).send({ error: 'Erro ao atualizar o status e enviar as mídias.' });
     }
 }
+  
+

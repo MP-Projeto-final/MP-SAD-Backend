@@ -1,5 +1,6 @@
 import * as donationRepository from "../repository/donations.repository.js";
 import qrcode from 'qrcode';
+import QRCode from 'qrcode';
 
 export async function createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado) {
     return await donationRepository.createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado);
@@ -90,4 +91,14 @@ export async function createDonationWithPackage(
     const pacote = await donationRepository.createPacote(donation.id, qrCodeBuffer, 'Criado');
     
     return { donation, pacote };
+}
+
+export async function generateQrCode(doacaoId, pacoteId) {
+    const qrCodeData = `Doacao ID: ${doacaoId}, Pacote ID: ${pacoteId}`;  
+    try {
+        const qrCodeImage = await QRCode.toDataURL(qrCodeData);  
+        return qrCodeImage;
+    } catch (error) {
+        throw new Error('Erro ao gerar o QR Code');
+    }
 }

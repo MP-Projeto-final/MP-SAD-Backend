@@ -28,21 +28,6 @@ export async function logoutUser(userId, token) {
   return result.rows[0]; 
 }
 
-// export async function findUserByToken(token) {
-//   const query = `
-//     SELECT usuarios.id, usuarios.nome, usuarios.email
-//     FROM usuarios
-//     JOIN sessions ON usuarios.id = sessions.id_usuario
-//     WHERE sessions.token = $1;
-//   `;
-//   const values = [token];
-//   const result = await db.query(query, values);
-
-//   console.log("Resultado da consulta findUserByToken:", result.rows[0]); 
-//   return result.rows[0];
-// }
-
-
 export async function findUserByToken(token) {
   const query = `
     SELECT usuarios.id AS user_id, usuarios.nome, usuarios.email
