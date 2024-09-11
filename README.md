@@ -25,7 +25,7 @@ Este projeto é uma API de gerenciamento de doações, utilizando Node.js, Seque
 ### 1. Clone o repositório
 
 ```bash
-git clone [https://github.com/seu-usuario/projeto-doacoes.git](https://github.com/MP-Projeto-final/MP-SAD-Backend)
+git clone https://github.com/MP-Projeto-final/MP-SAD-Backend
 cd 
 ```
 
