@@ -27,36 +27,6 @@ export async function createDonationWithStatistics(userId, donationData) {
     return donation;
 }
 
-// export async function createDonation(req, res) {
-//     const { 
-//         descricao, 
-//         destino_cep, 
-//         destino_rua, 
-//         destino_numero, 
-//         destino_complemento, 
-//         destino_bairro, 
-//         destino_cidade,  
-//         destino_estado, 
-//         origem_cidade,   
-//         origem_estado    
-//     } = req.body;
-
-//     const userId = res.locals.user.id; 
-
-//     try {
-//         const { donation, pacote } = await donationService.createDonationWithPackage(
-//             userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
-//             destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
-//         );
-
-//         const qrCode = await donationService.generateQrCode(donation.id, pacote.id); 
-
-//         res.status(201).json({ donation, pacote, qrCode });
-//     } catch (error) {
-//         res.status(error.status || 500).send(error.message);
-//     }
-// }
-
 export async function createDonation(req, res) {
     const { 
         descricao, 
@@ -154,19 +124,18 @@ export async function getMediaByPackageId(req, res) {
 export async function updatePacoteStatusAndUploadMedia(req, res) {
     const { id } = req.params; 
     const { status } = req.body; 
-    const files = req.files;
-  
-    try {
-      await donationService.updateStatus(id, status);
+    const file = req.file;
 
-      if (files && files.length > 0) {
-        await donationService.uploadMediaForPacote(id, files);
-      }
-  
-      res.status(200).send({ message: 'Status atualizado e mídias enviadas com sucesso!' });
+    try {
+        await donationService.updateStatus(id, status);
+
+        if (file) {
+            await donationService.createMedia(id, file.mimetype, file.buffer); 
+        }
+
+        res.status(200).send({ message: 'Status atualizado e mídia enviada com sucesso!' });
     } catch (error) {
-      res.status(500).send({ error: 'Erro ao atualizar o status e enviar as mídias.' });
+        console.error('Erro ao atualizar o status e enviar a mídia:', error);
+        res.status(500).send({ error: 'Erro ao atualizar o status e enviar a mídia.' });
     }
 }
-  
-

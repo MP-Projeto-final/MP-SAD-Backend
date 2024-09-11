@@ -1,8 +1,14 @@
 import express from 'express';
-import { createDonation, getStatistics, getDonationsByUser, updatePacoteStatusAndUploadMedia, getDonationById, getPacoteQrCode, uploadMedia, getMediaByPackageId } from '../controllers/donations.controller.js';
-import { schemaValidation } from '../middlewares/schema.validation.js';
+import { 
+    createDonation, 
+    getStatistics, 
+    getDonationsByUser, 
+    updatePacoteStatusAndUploadMedia, 
+    getDonationById, 
+    getPacoteQrCode, 
+    uploadMedia, 
+    getMediaByPackageId } from '../controllers/donations.controller.js';
 import { tokenValidation } from '../middlewares/token.validation.js';
-import { createDonationSchema } from '../schemas/donations.schema.js';
 import multer from "multer";
 
 const donationRouter = express.Router();

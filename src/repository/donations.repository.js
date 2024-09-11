@@ -1,26 +1,6 @@
 import { db } from "../database.js";
 import qrcode from 'qrcode';
 
-// export async function createDonation(
-//     userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
-//     destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
-// ) {
-//     const query = `
-//         INSERT INTO Doacoes (
-//             id_usuario, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
-//             destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
-//         )
-//         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-//         RETURNING *;
-//     `;
-//     const values = [
-//         userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, 
-//         destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado
-//     ];
-//     const result = await db.query(query, values);
-//     return result.rows[0];
-// }
-
 export async function getDonationsByUser(userId) {
     const query = `
         SELECT d.id AS donation_id, d.descricao, d.destino_cep, d.destino_rua, d.destino_numero, 
@@ -60,17 +40,6 @@ export async function getDonationById(donationId) {
     const result = await db.query(query, values);
     return result.rows[0]; 
 }
-
-// export async function createPackage(donationId, qrcode, status) {
-//     const query = `
-//         INSERT INTO Pacotes (doacao_id, qrcode, status)
-//         VALUES ($1, $2, $3)
-//         RETURNING *;
-//     `;
-//     const values = [donationId, qrcode, status];
-//     const result = await db.query(query, values);
-//     return result.rows[0];
-// }
 
 export async function getPackagesByDonationId(donationId) {
     const query = `
@@ -144,9 +113,11 @@ export async function createMedia(pacoteId, tipo, buffer) {
     const query = `
       INSERT INTO Midias (pacote_id, tipo, imagem, data_upload)
       VALUES ($1, $2, $3, NOW())
+      RETURNING *;
     `;
-    const values = [pacoteId, tipo, buffer];
-    await db.query(query, values);
+    const values = [pacoteId, tipo, buffer]; 
+    const result = await db.query(query, values);
+    return result.rows[0]; 
 }
   
 export async function getMediaByPackageId(pacoteId) {
@@ -230,8 +201,8 @@ export async function updateEstatisticas(origem_cidade, origem_estado, destino_c
 
 export async function createDonation(userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado) {
     const query = `
-        INSERT INTO Doacoes (id_usuario, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        INSERT INTO Doacoes (id_usuario, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado, data_enviado)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
         RETURNING *;
     `;
     const values = [userId, descricao, destino_cep, destino_rua, destino_numero, destino_complemento, destino_bairro, destino_cidade, destino_estado, origem_cidade, origem_estado];
@@ -239,7 +210,6 @@ export async function createDonation(userId, descricao, destino_cep, destino_rua
     const result = await db.query(query, values);
     return result.rows[0];  
 }
-
 
 export async function createPackage(donationId) {
     const query = `
