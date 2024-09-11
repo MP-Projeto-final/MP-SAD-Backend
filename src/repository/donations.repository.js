@@ -173,3 +173,12 @@ export async function getItensRecebidos() {
     const result = await db.query('SELECT descricao, COUNT(*) AS total FROM Pacotes WHERE status = \'entregue\' GROUP BY descricao');
     return result.rows;
 }
+
+export async function insertEstatisticas(origem, destino) {
+    const query = `
+        INSERT INTO Estatisticas (data_hora, origem, destino)
+        VALUES (NOW(), $1, $2);
+    `;
+    const values = [origem, destino];
+    await db.query(query, values);
+}
