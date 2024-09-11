@@ -161,6 +161,7 @@ export async function getStatistics() {
     };
 }
 
+
 // export async function createDonationWithPackage(
 //     userId,
 //     descricao,
@@ -262,27 +263,13 @@ export async function createDonationWithPackage(userId, descricao, destino_cep, 
     return { donation, pacote };
 }
 
-/**
- * Generates a QR code containing the donation and package IDs.
- * 
- * @param {number} donationId - The ID of the donation.
- * @param {number} pacoteId - The ID of the package.
- * 
- * @returns {string} Returns the QR code as a Data URL.
- */
+// Função para gerar QR Code
 export async function generateQrCode(donationId, pacoteId) {
     const qrCodeData = `Doacao ID: ${donationId}, Pacote ID: ${pacoteId}`;
-    return await QRCode.toDataURL(qrCodeData);  // Returns the QR code as a Data URL
+    return await QRCode.toDataURL(qrCodeData);  // Retorna a URL do QR Code gerado
 }
 
-/**
- * Creates a new statistic entry with the provided origin and destination information.
- * 
- * @param {string} origem_cidade - The city of the donation origin.
- * @param {string} origem_estado - The state of the donation origin.
- * @param {string} destino_cidade - The city of the donation destination.
- * @param {string} destino_estado - The state of the donation destination.
- */
+// Função para criar estatística
 export async function createEstatistica(origem_cidade, origem_estado, destino_cidade, destino_estado) {
     console.log("Dados para inserir em Estatisticas:", { origem_cidade, origem_estado, destino_cidade, destino_estado });
 
