@@ -1,6 +1,3 @@
-Aqui está o arquivo `README.md` em markdown, explicando como configurar e rodar o projeto:
-
-```markdown
 # Projeto de Doações - Backend
 
 Este projeto é uma API de gerenciamento de doações, utilizando Node.js, Sequelize, PostgreSQL (ou SQLite para testes), e integrações com um banco de dados.
@@ -133,10 +130,3 @@ Sinta-se à vontade para abrir issues ou pull requests para melhorias e correç�
 Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
 ```
 
-### Instruções principais:
-- **Instalar as dependências**.
-- **Configurar o banco de dados** no arquivo `.env`.
-- **Rodar as migrações**.
-- **Rodar o servidor** ou **executar os testes**. 
-
-Essa documentação fornece os detalhes necessários para configurar e rodar o projeto corretamente, além de rodar testes em um banco de dados SQLite em memória.
