@@ -41,7 +41,6 @@ export async function createDonation(req, res) {
     }
 }
 
-
 export async function getDonationsByUser(req, res) {
     const userId = res.locals.user.id; 
 
@@ -82,19 +81,15 @@ export async function uploadMedia(req, res) {
     }
 }
 
-
-
 export async function getStatistics(req, res) {
     try {
         const stats = await donationService.getStatistics();
-        console.log("Estatísticas recebidas:", stats); 
         res.status(200).json(stats);
     } catch (error) {
-        console.error("Erro ao buscar estatísticas:", error); 
+        console.error('Erro ao buscar estatísticas:', error);
         res.status(500).json({ message: 'Erro ao buscar estatísticas.' });
     }
 }
-
 
 export async function getMediaByPackageId(req, res) {
     const { pacoteId } = req.params;
@@ -123,4 +118,4 @@ export async function updatePacoteStatusAndUploadMedia(req, res) {
     } catch (error) {
       res.status(500).send({ error: 'Erro ao atualizar o status e enviar as mídias.' });
     }
-  }
+}
