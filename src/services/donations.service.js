@@ -60,35 +60,21 @@ export async function uploadMediaForPacote(pacoteId, files) {
 }
 
 export async function getStatistics() {
-    try {
-        const totalDoacoesFeitas = await donationRepository.getTotalDoacoesFeitas();
-        const totalDoacoesRecebidas = await donationRepository.getTotalDoacoesRecebidas();
-        const localidadesDeOrigem = await donationRepository.getLocalidadesDeOrigem();
-        const localidadesDeDestino = await donationRepository.getLocalidadesDeDestino();
-        const itensDoacao = await donationRepository.getItensDoacao();
-        const itensRecebidos = await donationRepository.getItensRecebidos();
+    const totalDoacoesFeitas = await donationRepository.getTotalDoacoesFeitas();
+    const totalDoacoesRecebidas = await donationRepository.getTotalDoacoesRecebidas();
+    const localidadesDeOrigem = await donationRepository.getLocalidadesDeOrigem();
+    const localidadesDeDestino = await donationRepository.getLocalidadesDeDestino();
+    const itensDoacao = await donationRepository.getItensDoacao();
+    const itensRecebidos = await donationRepository.getItensRecebidos();
 
-        console.log({
-            totalDoacoesFeitas,
-            totalDoacoesRecebidas,
-            localidadesDeOrigem,
-            localidadesDeDestino,
-            itensDoacao,
-            itensRecebidos,
-        }); // Log das estatísticas
-
-        return {
-            totalDoacoesFeitas,
-            totalDoacoesRecebidas,
-            localidadesDeOrigem,
-            localidadesDeDestino,
-            itensDoacao,
-            itensRecebidos
-        };
-    } catch (error) {
-        console.error("Erro na função getStatistics:", error);
-        throw error;
-    }
+    return {
+        totalDoacoesFeitas,
+        totalDoacoesRecebidas,
+        localidadesDeOrigem,
+        localidadesDeDestino,
+        itensDoacao,
+        itensRecebidos
+    };
 }
 
 export async function createDonationWithPackage(
